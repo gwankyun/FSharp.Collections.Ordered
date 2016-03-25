@@ -1,2 +1,5 @@
 # Original.Collections
-可以記住插入順序的集合
+F#的可以記住插入順序的集合
+
+目前有OriginalSet和OriginalMap兩個
+分別實現Set和Map模塊的所有函數
