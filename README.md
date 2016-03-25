@@ -1,5 +1,7 @@
 # Original.Collections
 F#的可以記住插入順序的集合
-
-目前有OriginalSet和OriginalMap兩個
-分別實現Set和Map模塊的所有函數
+目前有：
+1. OriginalSet
+	實現Set模塊函數
+2. OriginalMap
+	實現Map模塊函數
