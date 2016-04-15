@@ -29,17 +29,16 @@ type OriginalMap<'Key, 'Value when 'Key : comparison>(s: seq<'Key>, m: Map<'Key,
 //        new OriginalSet<'T>(elements, elements |> Set.ofSeq)
 
 module OriginalSet =
+    let add (value: 'T) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
+        let s = Seq.append set._Seq ([value] |> Seq.ofList)
+        let m = set._Set.Add value
+        new OriginalSet<'T>(s, m)
 
     let empty<'T when 'T : comparison> : OriginalSet<'T> when 'T : comparison  = new OriginalSet<'T>(Seq.empty, Set.empty)
 
     let singleton (value: 'T): OriginalSet<'T> when 'T : comparison =
         let s = Seq.singleton value
         new OriginalSet<'T>(s)
-
-    let add (value: 'T) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.append set._Seq ([value] |> Seq.ofList)
-        let m = set._Set.Add value
-        new OriginalSet<'T>(s, m)
 
     let contains (element: 'T) (set: OriginalSet<'T>): bool when 'T : comparison =
         set._Set.Contains element
