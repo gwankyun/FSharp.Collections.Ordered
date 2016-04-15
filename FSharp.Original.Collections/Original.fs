@@ -23,6 +23,10 @@ type OriginalMap<'Key, 'Value when 'Key : comparison>(s: seq<'Key>, m: Map<'Key,
     do
         self._Seq <- s
         self._Map <- m
+    member this.Seq() =
+        this._Seq
+    member this.Map() =
+        this._Map
     override this.ToString() =
         (this._Seq.ToString()) + "\n" + (this._Map.ToString())
 //    new (elements: seq<'T>) =
