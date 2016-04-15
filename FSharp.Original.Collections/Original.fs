@@ -10,6 +10,10 @@ type OriginalSet<'T when 'T : comparison>(s: seq<'T>, m: Set<'T>) as self =
     do
         self._Seq <- s
         self._Set <- m
+    member this.Seq() =
+        this._Seq
+    member this.Set() =
+        this._Set
     new (elements: seq<'T>) =
         new OriginalSet<'T>(elements, elements |> Set.ofSeq)
     override this.ToString() =
