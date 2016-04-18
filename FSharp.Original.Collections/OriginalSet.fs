@@ -21,7 +21,7 @@ type OriginalSet<'T when 'T : comparison>(s: seq<'T>, m: Set<'T>) as self =
 module OriginalSet =
     let add (value: 'T) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
         let s = Seq.append set._Seq ([value] |> Seq.ofList)
-        let m = set._Set.Add value
+        let m = set.Set().Add value
         new OriginalSet<'T>(s, m)
 
     let empty<'T when 'T : comparison> : OriginalSet<'T> when 'T : comparison  = new OriginalSet<'T>(Seq.empty, Set.empty)
@@ -31,25 +31,25 @@ module OriginalSet =
         new OriginalSet<'T>(s)
 
     let contains (element: 'T) (set: OriginalSet<'T>): bool when 'T : comparison =
-        set._Set.Contains element
+        set.Set().Contains element
 
     let isSubset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isSubset set1._Set set2._Set
+        Set.isSubset (set1.Set()) (set2.Set())
 
     let isProperSubset (set1:OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isProperSubset set1._Set set2._Set
+        Set.isProperSubset (set1.Set()) (set2.Set())
 
     let isSuperset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isSuperset set1._Set set2._Set
+        Set.isSuperset (set1.Set()) (set2.Set())
 
     let isProperSuperset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isProperSuperset set1._Set set2._Set
+        Set.isProperSuperset (set1.Set()) (set2.Set())
 
     let count (set: OriginalSet<'T>): int when 'T : comparison  =
-        set._Set.Count
+        set.Set().Count
 
     let exists (predicate: 'T -> bool) (set: OriginalSet<'T>): bool when 'T : comparison =
-        Set.exists predicate set._Set
+        Set.exists predicate (set.Set())
 
     let filter (predicate: 'T -> bool) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
         let s = Seq.filter predicate set._Seq
