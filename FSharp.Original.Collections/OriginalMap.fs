@@ -29,8 +29,11 @@ module OriginalMap =
     /// value: 输入值。
     /// table: 输入映射。
     let add (key: 'Key) (value: 'T) (table: OriginalMap<'Key,'T>): OriginalMap<'Key,'T> when 'Key : comparison =
-        let s = Seq.append table._Seq ([key] |> Seq.ofList)
-        let m = table._Map.Add(key, value)
+        let (s, m) =
+            let (s, m) = (table.Seq(), table.Map())
+            match m.ContainsKey(key) with
+            | true -> (s, m.Add(key, value))
+            | false -> (Seq.append s (Seq.singleton key), m.Add(key, value))
         new OriginalMap<'Key, 'T>(s, m)
     /// 返回从给定绑定中进行的新映射。
     /// elements: 键/值对的输入序列。
