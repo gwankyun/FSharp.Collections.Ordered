@@ -1,8 +1,5 @@
 ﻿namespace Original.Collections
 open System.Collections.Generic
-open System.Linq
-
-
 
 type OriginalMap<'Key, 'Value when 'Key : comparison>(s: seq<'Key>, m: Map<'Key, 'Value>) as self =
     [<DefaultValue>]
