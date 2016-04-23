@@ -1,137 +1,140 @@
 ﻿namespace Original.Collections
 open System.Collections.Generic
+open System.Collections
+open System
+open Extension
 
-type OriginalSet<'T when 'T : comparison>(s: seq<'T>, m: Set<'T>) as self =
-    [<DefaultValue>]
-    val mutable _Seq: seq<'T>
-    [<DefaultValue>]
-    val mutable _Set: Set<'T>
-    do
-        self._Seq <- s
-        self._Set <- m
-    member this.Seq() =
-        this._Seq
-    member this.Set() =
-        this._Set
-    new (elements: seq<'T>) =
-        new OriginalSet<'T>(elements, elements |> Set.ofSeq)
-    override this.ToString() =
-        (this._Seq.ToString()) + "\n" + (this._Set.ToString())
+type OriginalSet<'a  when 'a : comparison>(x : 'a seq, y : Set<'a>) =
+    member this.Seq() = x
+    member this.Set() = y
+//    interface System.Collections.IEnumerable with
+//        member this.GetEnumerator() =
+//            (this.Seq()
+//    interface System.Collections.IEnumerable with
+//        member this.GetEnumerator() =
+//            this.Seq().GetEnumerator()
+//    interface System.IComparable with
+//        member this.CompareTo(that : obj) =
+//            let that = that :?> OriginalSet<'a>
+//            compare (this.Seq()) (that.Seq())
+//    override Object.Equals(that : obj) =
+        
 
 module OriginalSet =
-    let add (value: 'T) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.append set._Seq ([value] |> Seq.ofList)
-        let m = set.Set().Add value
-        new OriginalSet<'T>(s, m)
+    let add (value : 'a) (set : OriginalSet<'a>) =
+        let a, b = set.Seq(), set.Set()
+        OriginalSet(Seq.append a (Seq.singleton value), b.Add(value))
 
-    let empty<'T when 'T : comparison> : OriginalSet<'T> when 'T : comparison  = new OriginalSet<'T>(Seq.empty, Set.empty)
+    let contains (value : 'a) (set : OriginalSet<'a>) =
+        Set.contains value (set.Set())
 
-    let singleton (value: 'T): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.singleton value
-        new OriginalSet<'T>(s)
+    let count (set : OriginalSet<'a>) =
+        Set.count (set.Set())
 
-    let contains (element: 'T) (set: OriginalSet<'T>): bool when 'T : comparison =
-        set.Set().Contains element
+    let difference (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        set1.Set() - set2.Set()
 
-    let isSubset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isSubset (set1.Set()) (set2.Set())
+    let empty<'a when 'a : comparison> =
+        OriginalSet<'a>(Seq.empty, Set.empty)
 
-    let isProperSubset (set1:OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isProperSubset (set1.Set()) (set2.Set())
-
-    let isSuperset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isSuperset (set1.Set()) (set2.Set())
-
-    let isProperSuperset (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): bool when 'T : comparison =
-        Set.isProperSuperset (set1.Set()) (set2.Set())
-
-    let count (set: OriginalSet<'T>): int when 'T : comparison  =
-        set.Set().Count
-
-    let exists (predicate: 'T -> bool) (set: OriginalSet<'T>): bool when 'T : comparison =
+    let exists (predicate : 'a -> bool) (set : OriginalSet<'a>) =
         Set.exists predicate (set.Set())
 
-    let filter (predicate: 'T -> bool) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.filter predicate set._Seq
-        let m = Set.filter predicate set._Set
-        new OriginalSet<'T>(s, m)
+    let toSeq (set : OriginalSet<'a>) =
+        set.Seq()
 
-    let map (mapping: 'T -> 'U) (set: OriginalSet<'T>): OriginalSet<'U> when 'T : comparison and 'U : comparison =
-        let s = Seq.map mapping set._Seq
-        let m = Set.map mapping set._Set
-        new OriginalSet<'U>(s, m)
+    let filter (predicate : 'a -> bool) (set : OriginalSet<'a>) =
+        let a, b = toSeq set, set.Set()
+        OriginalSet(Seq.filter predicate a, Set.filter predicate b)
 
-    let fold (folder: 'State -> 'T -> 'State) (state: 'State) (set: OriginalSet<'T>): 'State when 'T : comparison =
-        Seq.fold folder state set._Seq
+    let fold (folder : 's -> 't -> 's) (state : 's) (set : OriginalSet<'t>) =
+        let a = set |> toSeq |> Seq.fold folder state
+        let b = Set.ofSeq a
+        OriginalSet(a, b)
 
-    let head (set: OriginalSet<'T>): 'T when 'T : comparison =
-        Seq.head set._Seq
+    let foldBack (folder : 't -> 's -> 's) (set : OriginalSet<'t>) (state : 's) =
+        let a = Seq.foldBack folder (toSeq set) state
+        let b = Set.ofSeq a
+        OriginalSet(a, b)
+        
+    let forall (predicate : 'a -> bool) (set : OriginalSet<'a>) =
+        Set.forall predicate (set.Set())
 
-    let tail (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.tail set._Seq
-        let m = Set.ofSeq s
-        new OriginalSet<'T>(s, m)
+    let intersect (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        filter (fun x -> exists ((=) x) set2) set1
 
-    let reduce (reduction: 'T -> 'T -> 'T) (set: OriginalSet<'T>): 'T when 'T : comparison =
-        fold reduction (head set) (tail set)
+    let intersectMany (sets : OriginalSet<'a> seq) =
+        let head, tail = Seq.head sets, Seq.tail sets
+        filter (fun x -> Seq.forall (exists ((=) x)) tail) head
 
-    let foldBack (folder: 'T -> 'State -> 'State) (set: OriginalSet<'T>) (state: 'State): 'State when 'T : comparison =
-        Seq.foldBack folder set._Seq state
+    let isEmpty (set : OriginalSet<'a>) =
+        Set.isEmpty (set.Set())
 
-    let forall (predicate: 'T -> bool) (set: OriginalSet<'T>): bool when 'T : comparison =
-        Seq.forall predicate set._Seq
+    let isProperSubset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        Set.isProperSubset (set1.Set()) (set2.Set())
 
-    let intersect (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        filter (fun x -> contains x set2) set1
+    let isProperSuperset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        Set.isProperSuperset (set1.Set()) (set2.Set())
 
-    let intersectMany (sets: seq<OriginalSet<'T>>): OriginalSet<'T> when 'T : comparison =
-        Seq.reduce intersect sets
+    let isSubset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        Set.isSubset (set1.Set()) (set2.Set())
 
-    let union (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = (Seq.append set1._Seq set2._Seq) |> Seq.distinct
-        let m = Set.ofSeq s
-        new OriginalSet<'T>(s, m)
+    let isSuperset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        Set.isSuperset (set1.Set()) (set2.Set())
 
-    let unionMany (sets: seq<OriginalSet<'T>>): OriginalSet<'T> when 'T : comparison =
-        Seq.reduce union sets
+    let iter (action : 'a -> unit) (set : OriginalSet<'a>)  =
+        set |> toSeq |> Seq.iter action
 
-    let isEmpty (set: OriginalSet<'T>): bool when 'T : comparison =
-        set._Set.IsEmpty
+    let map (mapping : 'a -> 'b) (set : OriginalSet<'a>) =
+        OriginalSet(Seq.map mapping (toSeq set), Set.map mapping (set.Set()))
 
-    let iter (action: 'T -> unit)  (set: OriginalSet<'T>): unit when 'T : comparison =
-        Seq.iter action set._Seq
+    let maxElement (set : OriginalSet<'a>) =
+        Set.maxElement (set.Set())
 
-    let partition (predicate: 'T -> bool) (set: OriginalSet<'T>): OriginalSet<'T> * OriginalSet<'T> when 'T : comparison =
-        (filter predicate set, filter (predicate >> not) set)
+    let minElement (set : OriginalSet<'a>) =
+        Set.minElement (set.Set())
 
-    let remove (value: 'T) (set: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        let s = Seq.filter ((=) value) set._Seq
-        let m = Set.ofSeq s
-        new OriginalSet<'T>(s, m)
+    let ofArray (array : 'a []) =
+        let a = Seq.ofArray array
+        let b = Set.ofSeq a
+        OriginalSet(a, b)
 
-    let minElement (set: OriginalSet<'T>): 'T when 'T : comparison =
-        set._Set.MinimumElement
+    let ofList (elements : 'a list) =
+        let a = Seq.ofList elements
+        let b = Set.ofSeq a
+        OriginalSet(a, b)
+        
+    let ofSeq (elements : 'a list) =
+        let b = Set.ofSeq elements
+        OriginalSet(elements, b)
 
-    let maxElement (set: OriginalSet<'T>): 'T when 'T : comparison =
-        set._Set.MaximumElement
+    let partition (predicate : 'a -> bool) (set : OriginalSet<'a>) =
+        let sq1, sq2 = set |> toSeq |> Seq.partition predicate
+        Set.ofSeq sq1, Set.ofSeq sq2
 
-    let ofSeq (elements: seq<'T>): OriginalSet<'T> when 'T : comparison =
-        new OriginalSet<'T>(elements)
+    let remove (value : 'a) (set : OriginalSet<'a>) =
+        Set.remove value (set.Set())
 
-    let toSeq (set: OriginalSet<'T>): seq<'T> when 'T : comparison =
-        set._Seq
+    let singleton (value : 'a  when 'a : comparison) =
+        add value (OriginalSet<'a>(Seq.empty, Set.empty))
 
-    let ofList (elements:'T list): OriginalSet<'T> when 'T : comparison =
-        elements |> Seq.ofList |> ofSeq
-
-    let toList (set: OriginalSet<'T>): 'T list when 'T : comparison =
-        set |> toSeq |> List.ofSeq
-
-    let ofArray (array:'T []): OriginalSet<'T> when 'T : comparison =
-        array |> Seq.ofArray |> ofSeq
-
-    let toArray (set: OriginalSet<'T>): 'T [] when 'T : comparison =
+    let toArray (set : OriginalSet<'a>) =
         set |> toSeq |> Array.ofSeq
 
-    let difference (set1: OriginalSet<'T>) (set2: OriginalSet<'T>): OriginalSet<'T> when 'T : comparison =
-        filter (fun x -> not(contains x set2)) set1
+    let toList (set : OriginalSet<'a>) =
+        set |> toSeq |> List.ofSeq
+
+    let union (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        let mutable set : OriginalSet<'a> = empty
+        for i in (Seq.append (toSeq set1) (toSeq set2)) do
+            set <- add i set
+        set
+
+    let unionMany (sets : OriginalSet<'a> seq) =
+        Seq.fold union (Seq.head sets) (Seq.tail sets)
+
+    let (+) (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        union set1 set2
+
+    let (-) (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) =
+        filter (fun x -> set2 |> exists ((=) x) |> not) set1

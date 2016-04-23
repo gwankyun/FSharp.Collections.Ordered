@@ -10,18 +10,28 @@ let main argv =
         printfn "%s" "add pass"
     if ((OriginalSet.add 0 os).Set() = Set.singleton 0) then
         printfn "%s" "add pass"
-    let mutable m : OriginalMap<int, OriginalSet<int>> = OriginalMap.empty
+//    let mutable m : OriginalMap<int, OriginalSet<int>> = OriginalMap.empty
+//    for i in [0..9] do
+//        let key = i % 3
+//        if OriginalMap.containsKey key m then
+//            let v = OriginalMap.find key m
+//            let nv = OriginalSet.add i v
+//            m <- OriginalMap.add key nv m
+//        else
+//            m <- OriginalMap.add key (OriginalSet.singleton i) m
+//    for i in m.Seq() do
+//        for j in OriginalSet.toSeq (OriginalMap.find i m) do
+//            printf "%i" j  
+//        printfn "%s" " "    
+    let mutable m : OriginalMultiMap<int, int> = OriginalMultiMap.empty
     for i in [0..9] do
         let key = i % 3
-        if OriginalMap.containsKey key m then
-            let v = OriginalMap.find key m
-            let nv = OriginalSet.add i v
-            m <- OriginalMap.add key nv m
-        else
-            m <- OriginalMap.add key (OriginalSet.singleton i) m
-    for i in m.Seq() do
-        for j in OriginalSet.toSeq (OriginalMap.find i m) do
-            printf "%i" j  
-        printfn "%s" " "      
+        m <- OriginalMultiMap.add key i m
+    let j = m.Map().Map()
+    for kv in j do
+        printf "%i" kv.Key                                                              
+        for vt in OriginalSet.toSeq kv.Value do
+            printf " %i" vt
+        printfn "\n"
     printfn "%A" argv
     0 // return an integer exit code
