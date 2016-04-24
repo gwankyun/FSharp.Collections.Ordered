@@ -17,6 +17,14 @@ module OriginalMultiMap =
         let m : OriginalMap<'a, OriginalSet<'b>> = OriginalMap(Seq.empty, Map.empty)
         OriginalMultiMap<'a, 'b>(m)
 
+    let (+) (set1 : OriginalMultiMap<'a, 'b>) (set2 : OriginalMultiMap<'a, 'b>) =
+        let mutable set = set1
+        let om = set2.OriginalMap()
+        OriginalMap.iter (fun k v->
+            OriginalSet.iter (fun v1 ->
+                ignore(set <- add k v1 set)) v) om
+        set
+
 //    let containsKey (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
 //        let map  = table.OriginalMap().Map()
 //        Map.containsKey key map
