@@ -102,7 +102,7 @@ module OriginalMultiMap =
 //        let seq, map = table.Seq(), table.Map()
 //        Seq.pick (fun x -> chooser x map.[x]) seq
 //
-//    let remove (key : 'a) (table : OriginalMap<'a, 'b>) =
+//    let remove (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
 //        let seq, map = table.Seq() |> Seq.filter ((=) key), table.Map() |> Map.remove key
 //        OriginalMap(seq, map)
 //
@@ -115,8 +115,9 @@ module OriginalMultiMap =
 //    let toList (table : OriginalMap<'a, 'b>) =
 //        table |> toSeq |> List.ofSeq
 //
-//    let tryFind (key : 'a) (table : OriginalMap<'a, 'b>) =
-//        Map.tryFind key (table.Map())
+    let tryFind (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
+        let map = table.OriginalMap()
+        OriginalMap.tryFind key map
 //
 //    let tryFindKey (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
 //        Map.tryFindKey predicate (table.Map())
@@ -124,4 +125,3 @@ module OriginalMultiMap =
 //    let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = toSeq table, table.Map()
 //        Seq.tryPick (fun x -> chooser x map.[x]) seq
-
