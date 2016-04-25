@@ -44,10 +44,13 @@ module OriginalMultiMap =
                 ) table
         set
 
-//
-//    let find (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
-//        let map  = table.OriginalMap().Map()
-//        Map.find key map
+    let find (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
+        let map  = table.OriginalMap()
+        if containsKey key table then
+            raise (KeyNotFoundException())
+        else
+            OriginalMap.find key map
+            
 //
 //    let findKey (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
 //        let map  = table.OriginalMap()
