@@ -28,9 +28,9 @@ module OriginalMultiMap =
             set <- add k v set) set2
         set
 
-//    let containsKey (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
-//        let map  = table.OriginalMap().Map()
-//        Map.containsKey key map
+    let containsKey (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
+        let map  = table.OriginalMap()
+        OriginalMap.containsKey key map
 //
 //    let exists (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
 //        let map  = table.OriginalMap().Map()
