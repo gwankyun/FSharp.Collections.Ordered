@@ -63,8 +63,9 @@ module OriginalMultiMap =
 //        let seq, map = table.Seq(), table.Map()
 //        Seq.foldBack (fun x s -> folder x map.[x] state) seq state
 //
-//    let forall (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
-//        Map.forall predicate (table.Map())
+    let forall (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        let map  = table.OriginalMap()
+        OriginalMap.forall (fun k v -> OriginalSet.forall (predicate k) v) map
 //
 //    let isEmpty (table : OriginalMap<'a, 'b>) =
 //        Map.isEmpty (table.Map())
