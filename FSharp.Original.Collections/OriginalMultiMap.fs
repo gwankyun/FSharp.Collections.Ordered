@@ -59,8 +59,10 @@ module OriginalMultiMap =
 //    let isEmpty (table : OriginalMap<'a, 'b>) =
 //        Map.isEmpty (table.Map())
 //
-//    let iter (action : 'a -> 'b -> unit) (table : OriginalMap<'a, 'b>) =
-//        Map.iter action (table.Map())
+    let iter (action : 'a -> 'b -> unit) (table : OriginalMultiMap<'a, 'b>) =
+        let m = table.OriginalMap()
+        OriginalMap.iter (fun k v ->
+            OriginalSet.iter (fun i -> action k i) v) m
 //
 //    let map (mapping : 'a -> 'b -> 'c) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = table.Seq(), table.Map()
