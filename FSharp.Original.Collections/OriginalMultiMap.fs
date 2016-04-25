@@ -76,6 +76,10 @@ module OriginalMultiMap =
         iter (fun k v ->
             map <- add k (mapping k v) map) table
         map
+
+    let tryFind (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
+        let map = table.OriginalMap()
+        OriginalMap.tryFind key map
 //
 //    let ofArray (elements : ('a * 'b) []) =
 //        let seq = Seq.ofArray elements
@@ -102,9 +106,12 @@ module OriginalMultiMap =
 //        let seq, map = table.Seq(), table.Map()
 //        Seq.pick (fun x -> chooser x map.[x]) seq
 //
-//    let remove (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
-//        let seq, map = table.Seq() |> Seq.filter ((=) key), table.Map() |> Map.remove key
-//        OriginalMap(seq, map)
+    let remove (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
+        match tryFind key table with
+        | Some(v) ->
+            let map = table.OriginalMap()
+            OriginalMultiMap(OriginalMap.remove key map)
+        | None -> table
 //
 //    let toSeq (table : OriginalMap<'a, 'b>) =
 //        table.Seq()
@@ -115,9 +122,7 @@ module OriginalMultiMap =
 //    let toList (table : OriginalMap<'a, 'b>) =
 //        table |> toSeq |> List.ofSeq
 //
-    let tryFind (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
-        let map = table.OriginalMap()
-        OriginalMap.tryFind key map
+
 //
 //    let tryFindKey (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
 //        Map.tryFindKey predicate (table.Map())
