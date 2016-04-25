@@ -31,10 +31,10 @@ module OriginalMultiMap =
     let containsKey (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         OriginalMap.containsKey key map
-//
-//    let exists (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
-//        let map  = table.OriginalMap().Map()
-//        Map.exists (fun k t -> OriginalSet.exists (predicate k) t) map
+
+    let exists (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        let map  = table.OriginalMap()
+        OriginalMap.exists (fun k v -> OriginalSet.exists (predicate k) v) map
 //
 //    let filter (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = table.Seq(), table.Map()
