@@ -23,7 +23,9 @@ type OriginalSet<'a  when 'a : comparison>(x : 'a seq, y : Set<'a>) =
 module OriginalSet =
     let add (value : 'a) (set : OriginalSet<'a>) =
         let a, b = set.Seq(), set.Set()
-        OriginalSet(Seq.append a (Seq.singleton value), b.Add(value))
+        match Set.contains value b with
+        | true -> OriginalSet(a, b)
+        | false -> OriginalSet(Seq.append a (Seq.singleton value), b.Add(value))
 
     let contains (value : 'a) (set : OriginalSet<'a>) =
         Set.contains value (set.Set())

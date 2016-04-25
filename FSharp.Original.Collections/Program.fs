@@ -27,11 +27,8 @@ let main argv =
     for i in [0..9] do
         let key = i % 3
         m <- OriginalMultiMap.add key i m
-    let j = m.Map().Map()
-    for kv in j do
-        printf "%i" kv.Key                                                              
-        for vt in OriginalSet.toSeq kv.Value do
-            printf " %i" vt
-        printfn "\n"
+    m <- OriginalMultiMap.add 0 0 m
+    OriginalMultiMap.iter (fun k v ->
+        printfn "%i %i" k v) m
     printfn "%A" argv
     0 // return an integer exit code

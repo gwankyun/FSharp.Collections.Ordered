@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
+    <Compile Include="Seq.fs" />
     <Compile Include="OriginalSet.fs" />
     <Compile Include="OriginalMap.fs" />
     <Compile Include="OriginalMultiMap.fs" />
