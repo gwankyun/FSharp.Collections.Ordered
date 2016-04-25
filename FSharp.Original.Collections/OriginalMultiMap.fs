@@ -70,13 +70,12 @@ module OriginalMultiMap =
     let isEmpty (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         OriginalMap.isEmpty map
-//
-
-//
-//    let map (mapping : 'a -> 'b -> 'c) (table : OriginalMap<'a, 'b>) =
-//        let seq, map = table.Seq(), table.Map()
-//        let map = Map.map mapping map
-//        OriginalMap(seq, map)
+        
+    let map (mapping : 'a -> 'b -> 'c) (table : OriginalMultiMap<'a, 'b>) =
+        let mutable map : OriginalMultiMap<'a, 'c> = empty
+        iter (fun k v ->
+            map <- add k (mapping k v) map) table
+        map
 //
 //    let ofArray (elements : ('a * 'b) []) =
 //        let seq = Seq.ofArray elements
