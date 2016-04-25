@@ -66,9 +66,10 @@ module OriginalMultiMap =
     let forall (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         OriginalMap.forall (fun k v -> OriginalSet.forall (predicate k) v) map
-//
-//    let isEmpty (table : OriginalMap<'a, 'b>) =
-//        Map.isEmpty (table.Map())
+
+    let isEmpty (table : OriginalMultiMap<'a, 'b>) =
+        let map  = table.OriginalMap()
+        OriginalMap.isEmpty map
 //
 
 //
