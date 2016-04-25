@@ -53,7 +53,7 @@ module OriginalMultiMap =
             
     let findkey (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
-        OriginalMap.findKey (fun k v -> OriginalSet.exists (fun x -> predicate k x) v) map
+        OriginalMap.findKey (fun k v -> OriginalSet.exists (predicate k) v) map
 //
 //    let fold (folder : 's -> 'a -> 'b -> 's) (state : 's) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = table.Seq(), table.Map()
