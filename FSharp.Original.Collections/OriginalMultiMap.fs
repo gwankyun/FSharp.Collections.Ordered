@@ -35,10 +35,15 @@ module OriginalMultiMap =
     let exists (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         OriginalMap.exists (fun k v -> OriginalSet.exists (predicate k) v) map
-//
-//    let filter (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
-//        let seq, map = table.Seq(), table.Map()
-//        OriginalMap(Seq.filter (fun x -> predicate x map.[x]) seq, Map.filter predicate map)
+
+    let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        let mutable set : OriginalMultiMap<'a, 'b> = empty
+        iter (fun k v ->
+            if predicate k v then
+                set <- add k v set
+                ) table
+        set
+
 //
 //    let find (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
 //        let map  = table.OriginalMap().Map()
