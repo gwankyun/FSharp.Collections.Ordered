@@ -96,11 +96,11 @@ module OriginalMultiMap =
 //        let map = Map.ofSeq elements
 //        OriginalMap(seq, map)
 //
-//    let partition (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
-//        let seq, map = table.Seq(), table.Map()
-//        let seq1, seq2 = Seq.partition (fun x -> predicate x map.[x]) seq
-//        let map1, map2 = Map.partition predicate map
-//        OriginalMap(seq1, map1), OriginalMap(seq2, map2)
+    let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        let map = table.OriginalMap()
+        let map1 = filter predicate table
+        let map2 = filter (fun k v -> not (predicate k v)) table
+        map1, map2
 //
 //    let pick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = table.Seq(), table.Map()
