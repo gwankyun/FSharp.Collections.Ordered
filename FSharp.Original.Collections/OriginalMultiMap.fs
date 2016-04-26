@@ -124,8 +124,10 @@ module OriginalMultiMap =
 //
 
 //
-//    let tryFindKey (predicate : 'a -> 'b -> bool) (table : OriginalMap<'a, 'b>) =
-//        Map.tryFindKey predicate (table.Map())
+    let tryFindKey (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        match exists predicate table with
+        | true -> Some(findkey predicate table)
+        | false -> None
 //
 //    let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
 //        let seq, map = toSeq table, table.Map()
