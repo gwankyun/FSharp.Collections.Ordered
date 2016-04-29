@@ -91,11 +91,12 @@ module OriginalMultiMap =
 //        let map = Map.ofSeq seq
 //        OriginalMap(Seq.map (fun (k, _) -> k) seq, map)
 //        
-//    let ofSeq (elements : ('a * 'b) seq) =
-//        let seq = Seq.map (fun (k, _) -> k) elements
-//        let map = Map.ofSeq elements
-//        OriginalMap(seq, map)
-//
+    let ofSeq (elements : ('a * 'b) seq) =
+        let mutable map : OriginalMultiMap<'a, 'b> = empty
+        for (k, v) in elements do
+            map <- add k v map
+        map
+
     let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map = table.OriginalMap()
         let map1 = filter predicate table
