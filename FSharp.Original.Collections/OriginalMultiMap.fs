@@ -125,12 +125,10 @@ module OriginalMultiMap =
 
     let toArray (table : OriginalMultiMap<'a, 'b>) =
         table |> toSeq |> Array.ofSeq
-//        
-//    let toList (table : OriginalMap<'a, 'b>) =
-//        table |> toSeq |> List.ofSeq
-//
+        
+    let toList (table : OriginalMultiMap<'a, 'b>) =
+        table |> toSeq |> List.ofSeq
 
-//
     let tryFindKey (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         match exists predicate table with
         | true -> Some(findkey predicate table)
