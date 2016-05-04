@@ -82,12 +82,6 @@ module OriginalMultiMap =
         let map = table.OriginalMap()
         OriginalMap.tryFind key map
 
-//
-//    let ofList (elements : ('a * 'b) list) =
-//        let seq = Seq.ofList elements
-//        let map = Map.ofSeq seq
-//        OriginalMap(Seq.map (fun (k, _) -> k) seq, map)
-//        
     let ofSeq (elements : ('a * 'b) seq) =
         let mutable map : OriginalMultiMap<'a, 'b> = empty
         for (k, v) in elements do
@@ -96,6 +90,9 @@ module OriginalMultiMap =
 
     let ofArray (elements : ('a * 'b) []) =
         elements |> Array.toSeq |> ofSeq
+
+    let ofList (elements : ('a * 'b) list) =
+        elements |> List.toSeq |> ofSeq
 
     let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map = table.OriginalMap()
