@@ -36,15 +36,6 @@ module OriginalMultiMap =
         let map  = table.OriginalMap()
         OriginalMap.exists (fun k v -> OriginalSet.exists (predicate k) v) map
 
-    let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
-//        let map = table.OriginalMap()
-        let mutable set : OriginalMultiMap<'a, 'b> = empty
-        iter (fun k v ->
-            if predicate k v then
-                set <- add k v set
-                ) table
-        set
-
     let find (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         if containsKey key table then
@@ -86,12 +77,6 @@ module OriginalMultiMap =
     let ofList (elements : ('a * 'b) list) =
         elements |> List.toSeq |> ofSeq
 
-    let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
-        let map = table.OriginalMap()
-        let map1 = filter predicate table
-        let map2 = filter (fun k v -> not (predicate k v)) table
-        map1, map2
-
     let remove (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
         match tryFind key table with
         | Some(v) ->
@@ -106,6 +91,18 @@ module OriginalMultiMap =
                                  |> OriginalSet.toSeq
                                  |> Seq.map (fun y -> (x, y)))
           |> Seq.reduce Seq.append
+
+    let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        table
+        |> toSeq
+        |> Seq.filter (fun (k, v) -> predicate k v)
+        |> ofSeq
+
+    let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+        let map = table.OriginalMap()
+        let map1 = filter predicate table
+        let map2 = filter (fun k v -> not (predicate k v)) table
+        map1, map2
 
     let pick (chooser : 'a -> 'b -> 'c option) (table : OriginalMultiMap<'a, 'b>) =
         let seq = toSeq table
