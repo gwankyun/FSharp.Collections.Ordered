@@ -56,12 +56,6 @@ module OriginalMultiMap =
         let map  = table.OriginalMap()
         OriginalMap.findKey (fun k v -> OriginalSet.exists (predicate k) v) map
 
-
-//
-//    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : OriginalMap<'a, 'b>) (state : 's) =
-//        let seq, map = table.Seq(), table.Map()
-//        Seq.foldBack (fun x s -> folder x map.[x] state) seq state
-//
     let forall (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
         let map  = table.OriginalMap()
         OriginalMap.forall (fun k v -> OriginalSet.forall (predicate k) v) map
@@ -118,10 +112,12 @@ module OriginalMultiMap =
           |> Seq.reduce Seq.append
 
     let fold (folder : 's -> 'a -> 'b -> 's) (state : 's) (table : OriginalMultiMap<'a, 'b>) =
-//        let seq, map = table.Seq(), table.Map()
-//        Seq.fold (fun s x -> folder state x map.[x]) state (toSeq table)
-        let s = toSeq table
-        Seq.fold (fun s (xk, xv) -> folder s xk xv) (Seq.head s) (Seq.tail s)
+        let seq = toSeq table
+        Seq.fold (fun s (xk, xv) -> folder s xk xv) state seq
+    
+    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : OriginalMultiMap<'a, 'b>) (state : 's) =
+        let seq = toSeq table
+        Seq.foldBack (fun (k, v) s -> folder k v s) seq state
 
     let toArray (table : OriginalMultiMap<'a, 'b>) =
         table |> toSeq |> Array.ofSeq
