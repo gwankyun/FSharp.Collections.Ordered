@@ -129,7 +129,7 @@ module OriginalMultiMap =
         match exists predicate table with
         | true -> Some(findkey predicate table)
         | false -> None
-//
-//    let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
-//        let seq, map = toSeq table, table.Map()
-//        Seq.tryPick (fun x -> chooser x map.[x]) seq
+
+    let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMultiMap<'a, 'b>) =
+        let seq = toSeq table
+        Seq.pick (fun (k, v) -> chooser k v) seq
