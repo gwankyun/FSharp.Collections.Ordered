@@ -37,6 +37,7 @@ module OriginalMultiMap =
         OriginalMap.exists (fun k v -> OriginalSet.exists (predicate k) v) map
 
     let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) =
+//        let map = table.OriginalMap()
         let mutable set : OriginalMultiMap<'a, 'b> = empty
         iter (fun k v ->
             if predicate k v then
@@ -113,9 +114,14 @@ module OriginalMultiMap =
             let map = table.OriginalMap()
             OriginalMultiMap(OriginalMap.remove key map)
         | None -> table
-//
-//    let toSeq (table : OriginalMap<'a, 'b>) =
-//        table.Seq()
+
+    let toSeq (table : OriginalMultiMap<'a, 'b>) =
+        let m = table.OriginalMap()
+        let s = m |> OriginalMap.toSeq
+        s |> Seq.map (fun x -> m |> OriginalMap.find x
+                                 |> OriginalSet.toSeq
+                                 |> Seq.map (fun y -> (x, y)))
+          |> Seq.reduce Seq.append
 //
 //    let toArray (table : OriginalMap<'a, 'b>) =
 //        table |> toSeq |> Array.ofSeq
