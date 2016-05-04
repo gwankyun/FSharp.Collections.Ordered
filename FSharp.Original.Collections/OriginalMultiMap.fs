@@ -91,11 +91,7 @@ module OriginalMultiMap =
         let map1 = filter predicate table
         let map2 = filter (fun k v -> not (predicate k v)) table
         map1, map2
-//
-//    let pick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
-//        let seq, map = table.Seq(), table.Map()
-//        Seq.pick (fun x -> chooser x map.[x]) seq
-//
+
     let remove (key : 'a) (table : OriginalMultiMap<'a, 'b>) =
         match tryFind key table with
         | Some(v) ->
@@ -110,6 +106,10 @@ module OriginalMultiMap =
                                  |> OriginalSet.toSeq
                                  |> Seq.map (fun y -> (x, y)))
           |> Seq.reduce Seq.append
+
+    let pick (chooser : 'a -> 'b -> 'c option) (table : OriginalMultiMap<'a, 'b>) =
+        let seq = toSeq table
+        Seq.pick (fun (k, v) -> chooser k v) seq
 
     let fold (folder : 's -> 'a -> 'b -> 's) (state : 's) (table : OriginalMultiMap<'a, 'b>) =
         let seq = toSeq table
