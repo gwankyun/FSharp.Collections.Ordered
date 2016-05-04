@@ -122,9 +122,9 @@ module OriginalMultiMap =
                                  |> OriginalSet.toSeq
                                  |> Seq.map (fun y -> (x, y)))
           |> Seq.reduce Seq.append
-//
-//    let toArray (table : OriginalMap<'a, 'b>) =
-//        table |> toSeq |> Array.ofSeq
+
+    let toArray (table : OriginalMultiMap<'a, 'b>) =
+        table |> toSeq |> Array.ofSeq
 //        
 //    let toList (table : OriginalMap<'a, 'b>) =
 //        table |> toSeq |> List.ofSeq
