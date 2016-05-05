@@ -129,4 +129,4 @@ module OriginalMultiMap =
 
     let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMultiMap<'a, 'b>) =
         let seq = toSeq table
-        Seq.pick (fun (k, v) -> chooser k v) seq
+        Seq.pick (fun (k, v) -> chooser k v)
