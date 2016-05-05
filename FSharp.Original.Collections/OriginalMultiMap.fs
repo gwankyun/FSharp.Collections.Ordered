@@ -1,5 +1,6 @@
 ﻿namespace Original.Collections
 open System.Collections.Generic
+open Extension
 
 type OriginalMultiMap<'a, 'b  when 'a : comparison and 'b : comparison>(x : OriginalMap<'a, OriginalSet<'b>>) =
     member this.OriginalMap() = x
@@ -130,3 +131,9 @@ module OriginalMultiMap =
     let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMultiMap<'a, 'b>) =
         let seq = toSeq table
         Seq.pick (fun (k, v) -> chooser k v)
+
+    let difference (table1 : OriginalMultiMap<'a, 'b>) (table2 : OriginalMultiMap<'a, 'b>) =
+        filter (fun k v ->
+            match tryFindKey (fun a b -> k = a && v = b) table2 with
+            | Some(x) -> false
+            | None -> true) table1
