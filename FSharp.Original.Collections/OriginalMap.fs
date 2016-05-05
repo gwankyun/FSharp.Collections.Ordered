@@ -99,3 +99,11 @@ module OriginalMap =
     let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
         let seq, map = toSeq table, table.Map()
         Seq.tryPick (fun x -> chooser x map.[x]) seq
+
+    let difference (table1 : OriginalMap<'a, 'b>) (table2 : OriginalMap<'a, 'b>) =
+        let s1 = table1.Seq()       
+        let m1 = table1.Map()
+        let m2 = table2.Map()
+        let map = Map.difference m1 m2
+        let seq = Seq.filter (fun x -> Map.containsKey x map) s1
+        OriginalMap(seq, map)

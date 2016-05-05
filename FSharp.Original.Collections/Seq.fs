@@ -28,3 +28,13 @@ module Seq =
                     f t (pushFront temp source2) Seq.empty
                 | false -> f t source2 (pushFront h temp)
         f source Seq.empty Seq.empty
+    let groupByKey (source : ('a * 'b) seq) =
+
+        source |> Seq.groupBy Tuple.first
+               |> Seq.map (fun (k, v) -> (k, v |> Seq.map Tuple.second))
+
+    let groupByValue (source : ('a * 'b) seq) =
+        source |> Seq.groupBy Tuple.second
+               |> Seq.map (fun (k, v) -> (k, v |> Seq.map Tuple.first))
+
+//    let groupByOrigin
