@@ -50,10 +50,18 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
     <Compile Include="Seq.fs" />
+    <Compile Include="Map.fs" />
     <Compile Include="OriginalSet.fs" />
     <Compile Include="OriginalMap.fs" />
     <Compile Include="OriginalMultiMap.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FSharp.Extension\FSharp.Extension\FSharp.Extension.fsproj">
+      <Name>FSharp.Extension</Name>
+      <Project>{bb731aa0-7d6f-4eef-aa7c-6e475940af52}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
