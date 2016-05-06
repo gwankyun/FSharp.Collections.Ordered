@@ -64,10 +64,11 @@ module OriginalMultiMap =
         OriginalMap.tryFind key map
     
     let ofSeq (elements : ('a * 'b) seq) = 
-        let mutable map : OriginalMultiMap<'a, 'b> = empty
-        for (k, v) in elements do
-            map <- add k v map
-        map
+        Seq.fold (fun s (k, v) -> add k v s) empty elements
+//        let mutable map : OriginalMultiMap<'a, 'b> = empty
+//        for (k, v) in elements do
+//            map <- add k v map
+//        map
     
     let ofArray (elements : ('a * 'b) []) = 
         elements
@@ -88,20 +89,28 @@ module OriginalMultiMap =
     
     let toSeq (table : OriginalMultiMap<'a, 'b>) = 
         let m = table.OriginalMap()
-        let s = m |> OriginalMap.toSeq
-        s
-        |> Seq.map (fun x -> 
-               m
-               |> OriginalMap.find x
-               |> OriginalSet.toSeq
-               |> Seq.map (fun y -> (x, y)))
-        |> Seq.reduce Seq.append
+        let s = m.Seq()
+        seq {
+            for i in s do
+                for j in (OriginalMap.find i m).Seq() do
+                    yield (i, j)
+        }
     
     let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Seq.filter (fun (k, v) -> predicate k v)
-        |> ofSeq
+        let r =
+            table.OriginalMap()
+            |> OriginalMap.map (fun k v -> v |> OriginalSet.filter (predicate k))
+            |> OriginalMap.filter (fun k v -> v |> OriginalSet.isEmpty |> not)
+        OriginalMultiMap(r)
+//        printfn "in filter"
+//        table
+//        |> (fun x ->
+////            printfn "toSeq OK"
+//            toSeq x)
+//        |> (fun x ->
+//            printfn "toSeq OK"
+//            Seq.filter (fun (k, v) -> predicate k v) x)
+//        |> ofSeq
     
     let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()

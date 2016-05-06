@@ -28,7 +28,14 @@ let main argv =
         let key = i % 3
         m <- OriginalMultiMap.add key i m
     m <- OriginalMultiMap.add 0 0 m
+    let n = 1000000
     OriginalMultiMap.iter (fun k v ->
         printfn "%i %i" k v) m
+    let sz = Seq.zip (seq {for i in [0..n] -> i}) (seq {for i in [0..n] -> i})
+    printfn "%s" "Seq.zip OK"
+    let s = OriginalMultiMap.ofSeq sz
+    printfn "%s" "OriginalMultiMap.ofSeq OK"
+    let sf = s |> OriginalMultiMap.filter (fun k v -> (v % 2) = 0)
+    printfn "%s" "OriginalMultiMap.filter OK"
     printfn "%A" argv
     0 // return an integer exit code

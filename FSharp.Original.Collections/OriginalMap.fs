@@ -82,7 +82,8 @@ module OriginalMap =
         OriginalMap(seq, map)
 
     let toSeq (table : OriginalMap<'a, 'b>) =
-        table.Seq()
+        let seq = table.Seq()
+        seq |> Seq.map (fun x -> (x, find x table))
 
     let toArray (table : OriginalMap<'a, 'b>) =
         table |> toSeq |> Array.ofSeq
@@ -98,7 +99,7 @@ module OriginalMap =
 
     let tryPick (chooser : 'a -> 'b -> 'c option) (table : OriginalMap<'a, 'b>) =
         let seq, map = toSeq table, table.Map()
-        Seq.tryPick (fun x -> chooser x map.[x]) seq
+        Seq.tryPick (fun x -> chooser x map.[x])
 
     let difference (table1 : OriginalMap<'a, 'b>) (table2 : OriginalMap<'a, 'b>) =
         let s1 = table1.Seq()       
