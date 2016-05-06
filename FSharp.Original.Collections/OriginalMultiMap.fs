@@ -138,6 +138,6 @@ module OriginalMultiMap =
     
     let difference (table1 : OriginalMultiMap<'a, 'b>) (table2 : OriginalMultiMap<'a, 'b>) = 
         filter (fun k v -> 
-            match tryFindKey (fun a b -> k = a && v = b) table2 with
+            match tryFindKey (fun a b -> k = a || v = b) table2 with
             | Some(x) -> false
             | None -> true) table1
