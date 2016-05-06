@@ -65,10 +65,6 @@ module OriginalMultiMap =
     
     let ofSeq (elements : ('a * 'b) seq) = 
         Seq.fold (fun s (k, v) -> add k v s) empty elements
-//        let mutable map : OriginalMultiMap<'a, 'b> = empty
-//        for (k, v) in elements do
-//            map <- add k v map
-//        map
     
     let ofArray (elements : ('a * 'b) []) = 
         elements
@@ -102,15 +98,6 @@ module OriginalMultiMap =
             |> OriginalMap.map (fun k v -> v |> OriginalSet.filter (predicate k))
             |> OriginalMap.filter (fun k v -> v |> OriginalSet.isEmpty |> not)
         OriginalMultiMap(r)
-//        printfn "in filter"
-//        table
-//        |> (fun x ->
-////            printfn "toSeq OK"
-//            toSeq x)
-//        |> (fun x ->
-//            printfn "toSeq OK"
-//            Seq.filter (fun (k, v) -> predicate k v) x)
-//        |> ofSeq
     
     let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
