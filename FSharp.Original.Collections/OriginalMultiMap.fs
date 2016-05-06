@@ -141,3 +141,10 @@ module OriginalMultiMap =
             match tryFindKey (fun a b -> k = a || v = b) table2 with
             | Some(x) -> false
             | None -> true) table1
+
+    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) =
+        let e : OriginalMultiMap<'key, 'a * 'b> = empty
+        fold (fun s a b ->
+            let key = projection a b
+            add key (a, b) s
+        ) e table
