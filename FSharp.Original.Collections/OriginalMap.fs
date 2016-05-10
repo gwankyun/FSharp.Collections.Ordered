@@ -9,7 +9,8 @@ type OriginalMap<'a, 'b  when 'a : comparison>(x : 'a seq, y : Map<'a, 'b>) =
 module OriginalMap =
     let add (key : 'a) (value : 'b) (set : OriginalMap<'a, 'b>) =
         let (a, b) = (set.Seq(), set.Map())
-        OriginalMap(Seq.append a (Seq.singleton key), b.Add(key, value))
+        let seq = key :: List.ofSeq a |> Seq.ofList
+        OriginalMap(seq, b.Add(key, value))
 
     let containsKey (key : 'a) (table : OriginalMap<'a, 'b>) =
         Map.containsKey key (table.Map())

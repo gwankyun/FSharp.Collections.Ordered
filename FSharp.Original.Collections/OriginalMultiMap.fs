@@ -12,9 +12,12 @@ module OriginalMultiMap =
         
         let v = 
             match OriginalMap.tryFind key m with
-            | Some(m) -> OriginalSet.add value m
-            | None -> OriginalSet.singleton value
-        OriginalMultiMap(OriginalMap.add key v m)
+            | Some(v) -> 
+                m
+                |> OriginalMap.remove key
+                |> OriginalMap.add key (OriginalSet.add value v)
+            | None -> OriginalMap.add key (OriginalSet.singleton value) m
+        OriginalMultiMap(v)
     
     let empty<'a, 'b when 'a : comparison and 'b : comparison> = 
         let m : OriginalMap<'a, OriginalSet<'b>> = OriginalMap(Seq.empty, Map.empty)
@@ -63,8 +66,7 @@ module OriginalMultiMap =
         let map = table.OriginalMap()
         OriginalMap.tryFind key map
     
-    let ofSeq (elements : ('a * 'b) seq) = 
-        Seq.fold (fun s (k, v) -> add k v s) empty elements
+    let ofSeq (elements : ('a * 'b) seq) = Seq.fold (fun s (k, v) -> add k v s) empty elements
     
     let ofArray (elements : ('a * 'b) []) = 
         elements
@@ -86,17 +88,20 @@ module OriginalMultiMap =
     let toSeq (table : OriginalMultiMap<'a, 'b>) = 
         let m = table.OriginalMap()
         let s = m.Seq()
-        seq {
-            for i in s do
-                for j in (OriginalMap.find i m).Seq() do
-                    yield (i, j)
-        }
+        let mutable seq : ('a * 'b) list = List.empty
+        iter (fun k v ->
+            seq <- (k, v) :: seq
+        ) table
+        seq |> Seq.ofList |> Seq.rev
     
     let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
-        let r =
+        let r = 
             table.OriginalMap()
             |> OriginalMap.map (fun k v -> v |> OriginalSet.filter (predicate k))
-            |> OriginalMap.filter (fun k v -> v |> OriginalSet.isEmpty |> not)
+            |> OriginalMap.filter (fun k v -> 
+                   v
+                   |> OriginalSet.isEmpty
+                   |> not)
         OriginalMultiMap(r)
     
     let partition (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
@@ -141,10 +146,12 @@ module OriginalMultiMap =
             match tryFindKey (fun a b -> k = a || v = b) table2 with
             | Some(x) -> false
             | None -> true) table1
-
-    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) =
-        let e : OriginalMultiMap<'key, 'a * 'b> = empty
-        fold (fun s a b ->
-            let key = projection a b
-            add key (a, b) s
-        ) e table
+    
+    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) = 
+        let t =
+            table
+            |> fold (fun s a b ->
+                let key = projection a b
+                add key (a, b) s) empty
+        t.OriginalMap()
+        |> OriginalMap.map (fun k v -> (k, OriginalSet.r

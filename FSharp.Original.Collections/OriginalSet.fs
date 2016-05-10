@@ -25,7 +25,9 @@ module OriginalSet =
         let a, b = set.Seq(), set.Set()
         match Set.contains value b with
         | true -> OriginalSet(a, b)
-        | false -> OriginalSet(Seq.append a (Seq.singleton value), b.Add(value))
+        | false ->
+            let seq = value :: List.ofSeq a |> Seq.ofList
+            OriginalSet(seq, b.Add(value))
 
     let contains (value : 'a) (set : OriginalSet<'a>) =
         Set.contains value (set.Set())
@@ -106,7 +108,7 @@ module OriginalSet =
         let b = Set.ofSeq a
         OriginalSet(a, b)
         
-    let ofSeq (elements : 'a list) =
+    let ofSeq (elements : 'a seq) =
         let b = Set.ofSeq elements
         OriginalSet(elements, b)
 
