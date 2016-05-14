@@ -35,27 +35,22 @@ module OriginalSet =
     let empty<'a when 'a : comparison> = OriginalSet<'a>(LazyList.empty, Set.empty)
     let exists (predicate : 'a -> bool) (set : OriginalSet<'a>) = Set.exists predicate (set.Set())
     let toSeq (set : OriginalSet<'a>) = set.List() |> LazyList.toSeq
-    
     let filter (predicate : 'a -> bool) (set : OriginalSet<'a>) = 
-//        let a, b, c = toSeq set, set.Set(), set.List()
+        //        let a, b, c = toSeq set, set.Set(), set.List()
         OriginalSet(LazyList.filter predicate (set.List()), Set.filter predicate (set.Set()))
-    
-    let fold (folder : 's -> 't -> 's) (state : 's) (set : OriginalSet<'t>) = 
-        set.List()
-        |> LazyList.fold folder state
-//        |> List.ofSeq
-//        |> Seq.ofList
-//        |> Seq.fold folder state
-    
+    let fold (folder : 's -> 't -> 's) (state : 's) (set : OriginalSet<'t>) = set.List() |> LazyList.fold folder state
+    //        |> List.ofSeq
+    //        |> Seq.ofList
+    //        |> Seq.fold folder state
     //        let a = set |> toSeq |> Seq.fold folder state
     //        let b = Set.ofSeq a
     //        OriginalSet(a, b)
     let foldBack (folder : 't -> 's -> 's) (set : OriginalSet<'t>) (state : 's) = 
-        set.List()
-        |> List.ofSeq
-        |> Seq.ofList
-        |> (fun x -> Seq.foldBack folder x state)
-    
+        LazyList.foldBack folder (set.List()) state
+    //        set.List()
+    //        |> List.ofSeq
+    //        |> Seq.ofList
+    //        |> (fun x -> Seq.foldBack folder x state)
     //        let a = Seq.foldBack folder (toSeq set) state
     //        let b = Set.ofSeq a
     //        OriginalSet(a, b)
@@ -79,12 +74,16 @@ module OriginalSet =
         |> Seq.iter action
     
     let map (mapping : 'a -> 'b) (set : OriginalSet<'a>) = 
-        OriginalSet(Seq.map mapping (toSeq set), Set.map mapping (set.Set()), List.map mapping (set.List()))
+        OriginalSet(LazyList.map mapping (set.List()), Set.map mapping (set.Set()))
     let maxElement (set : OriginalSet<'a>) = Set.maxElement (set.Set())
     let minElement (set : OriginalSet<'a>) = Set.minElement (set.Set())
     
     let ofArray (array : 'a []) = 
-        let list = array |> List.ofArray |> List.rev
+        let list = 
+            array
+            |> List.ofArray
+            |> List.rev
+        
         let seq = list |> Seq.ofList
         let set = Set.ofList (List.rev list)
         OriginalSet(seq, set, list)
@@ -97,7 +96,12 @@ module OriginalSet =
     
     let ofSeq (elements : 'a seq) = 
         let seq = elements
-        let list = seq |> Seq.rev |> List.ofSeq
+        
+        let list = 
+            seq
+            |> Seq.rev
+            |> List.ofSeq
+        
         let set = Set.ofList (List.rev list)
         OriginalSet(seq, set, list)
     

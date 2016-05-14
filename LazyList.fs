@@ -35,3 +35,7 @@ module LazyList =
         list
         |> toSeq
         |> Seq.fold folder state
+
+    let foldBack (folder : 't -> 's -> 's) (list : LazyList<'t>) (state : 's) =
+        list
+        |> fold (fun s t -> folder t s) state
