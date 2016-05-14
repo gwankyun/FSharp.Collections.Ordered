@@ -9,6 +9,12 @@ type LazyList<'a>(x : 'a seq, y : 'a list) =
     member this.Seq() = x
     member this.List() = y
 
+module LazyList =
+    let add (value : 'a) (list : LazyList<'a>) =
+        let ls = value :: list.List()
+        let seq = ls |> Seq.ofList
+        LazyList(seq, ls)
+
 type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) = 
     member this.Seq() = x
     member this.Set() = y
