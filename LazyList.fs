@@ -25,3 +25,5 @@ module LazyList =
     let filter (predicate : 'a -> bool) (list : LazyList<'a>) = 
         let seq = list.Seq() |> Seq.filter predicate
         makeLazyListFromSeq seq
+    
+    let empty<'a> = LazyList<'a>(Seq.empty, List.empty)
