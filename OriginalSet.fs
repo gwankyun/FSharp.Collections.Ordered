@@ -15,10 +15,21 @@ module LazyList =
         let seq = ls |> Seq.ofList
         LazyList(seq, ls)
 
-    let map (mapping : 'a -> 'b) (list : LazyList<'a>) =
-        let seq = list.Seq() |> Seq.map mapping
+    let makeLazyListFromSeq (seq : 'a seq) =
         let ls = List.ofSeq seq
         LazyList(seq, ls)
+
+    let map (mapping : 'a -> 'b) (list : LazyList<'a>) =
+        let seq = list.Seq() |> Seq.map mapping
+        makeLazyListFromSeq seq
+//        let ls = List.ofSeq seq
+//        LazyList(seq, ls)
+
+    let filter (predicate : 'a -> bool) (list : LazyList<'a>) =
+        let seq = list.Seq() |> Seq.filter predicate
+        makeLazyListFromSeq seq
+//        let ls = List.ofSeq seq
+//        LazyList(seq, ls)
 
 type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) = 
     member this.Seq() = x
