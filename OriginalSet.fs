@@ -5,6 +5,10 @@ open System.Collections
 open System
 open Extension
 
+type LazyList<'a>(x : 'a seq, y : 'a list) =
+    member this.Seq() = x
+    member this.List() = y
+
 type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) = 
     member this.Seq() = x
     member this.Set() = y
