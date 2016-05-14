@@ -1,5 +1,6 @@
-# Original.Collections
+# FSharp.Original.Collections
 F#的可以記住插入順序的集合
+依賴FSharp.Extension庫
 
 目前有：
 
