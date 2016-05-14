@@ -39,3 +39,19 @@ module LazyList =
     let foldBack (folder : 't -> 's -> 's) (list : LazyList<'t>) (state : 's) =
         list
         |> fold (fun s t -> folder t s) state
+
+    let ofArray (array : 'a []) = 
+        array
+        |> Seq.ofArray
+        |> Seq.rev
+        |> makeLazyListFromSeq
+
+    let ofList (elements : 'a list) = 
+        elements
+        |> Seq.ofList
+        |> Seq.rev
+        |> makeLazyListFromSeq
+
+    let ofSeq (elements : 'a seq) = 
+        elements
+        |> makeLazyListFromSeq

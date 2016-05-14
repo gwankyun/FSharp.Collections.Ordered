@@ -79,31 +79,19 @@ module OriginalSet =
     let minElement (set : OriginalSet<'a>) = Set.minElement (set.Set())
     
     let ofArray (array : 'a []) = 
-        let list = 
-            array
-            |> List.ofArray
-            |> List.rev
-        
-        let seq = list |> Seq.ofList
-        let set = Set.ofList (List.rev list)
-        OriginalSet(seq, set, list)
+        let list = LazyList.ofArray array
+        let set = Set.ofList (list.List())
+        OriginalSet(list, set)
     
     let ofList (elements : 'a list) = 
-        let list = elements |> List.rev
-        let seq = list |> Seq.ofList
-        let set = Set.ofList (List.rev list)
-        OriginalSet(seq, set, list)
+        let list = LazyList.ofList elements
+        let set = Set.ofList (list.List())
+        OriginalSet(list, set)
     
     let ofSeq (elements : 'a seq) = 
-        let seq = elements
-        
-        let list = 
-            seq
-            |> Seq.rev
-            |> List.ofSeq
-        
-        let set = Set.ofList (List.rev list)
-        OriginalSet(seq, set, list)
+        let list = LazyList.ofSeq elements
+        let set = Set.ofList (list.List())
+        OriginalSet(list, set)
     
     let partition (predicate : 'a -> bool) (set : OriginalSet<'a>) = 
         let sq1, sq2 = 
@@ -113,7 +101,7 @@ module OriginalSet =
         Set.ofSeq sq1, Set.ofSeq sq2
     
     let remove (value : 'a) (set : OriginalSet<'a>) = Set.remove value (set.Set())
-    let singleton (value : 'a when 'a : comparison) = add value (OriginalSet<'a>(Seq.empty, Set.empty, List.empty))
+    let singleton (value : 'a when 'a : comparison) = add value (OriginalSet<'a>(LazyList.empty, Set.empty))
     
     let toArray (set : OriginalSet<'a>) = 
         set
