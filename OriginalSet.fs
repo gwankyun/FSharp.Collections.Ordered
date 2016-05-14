@@ -15,6 +15,11 @@ module LazyList =
         let seq = ls |> Seq.ofList
         LazyList(seq, ls)
 
+    let map (mapping : 'a -> 'b) (list : LazyList<'a>) =
+        let seq = list.Seq() |> Seq.map mapping
+        let ls = List.ofSeq seq
+        LazyList(seq, ls)
+
 type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) = 
     member this.Seq() = x
     member this.Set() = y
