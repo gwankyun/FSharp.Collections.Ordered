@@ -27,3 +27,11 @@ module LazyList =
         makeLazyListFromSeq seq
     
     let empty<'a> = LazyList<'a>(Seq.empty, List.empty)
+
+    let toSeq (list : LazyList<'a>) =
+        list.Seq() |> Seq.rev
+
+    let fold (folder : 's -> 't -> 's) (state : 's) (list : LazyList<'t>) = 
+        list
+        |> toSeq
+        |> Seq.fold folder state

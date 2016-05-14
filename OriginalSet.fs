@@ -5,10 +5,9 @@ open System.Collections
 open System
 open Extension
 
-type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) = 
-    member this.Seq() = x
+type OriginalSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
     member this.Set() = y
-    member this.List() = z
+    member this.List() = x
 
 //    interface System.Collections.IEnumerable with
 //        member this.GetEnumerator() =
@@ -23,30 +22,30 @@ type OriginalSet<'a when 'a : comparison>(x : 'a seq, y : Set<'a>, z : 'a list) 
 //    override Object.Equals(that : obj) =
 module OriginalSet = 
     let add (value : 'a) (set : OriginalSet<'a>) = 
-        let a, b, c = set.Seq(), set.Set(), set.List()
+        let a, b = set.List(), set.Set()
         match Set.contains value b with
-        | true -> OriginalSet(a, b, c)
+        | true -> OriginalSet(a, b)
         | false -> 
-            let list = value :: c
-            let seq = list |> Seq.ofList
-            OriginalSet(seq, b.Add(value), list)
+            let list = a.Cons(value)
+            OriginalSet(list, b.Add(value))
     
     let contains (value : 'a) (set : OriginalSet<'a>) = Set.contains value (set.Set())
     let count (set : OriginalSet<'a>) = Set.count (set.Set())
     let difference (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = set1.Set() - set2.Set()
-    let empty<'a when 'a : comparison> = OriginalSet<'a>(Seq.empty, Set.empty, List.empty)
+    let empty<'a when 'a : comparison> = OriginalSet<'a>(LazyList.empty, Set.empty)
     let exists (predicate : 'a -> bool) (set : OriginalSet<'a>) = Set.exists predicate (set.Set())
-    let toSeq (set : OriginalSet<'a>) = set.Seq() |> Seq.rev
+    let toSeq (set : OriginalSet<'a>) = set.List() |> LazyList.toSeq
     
     let filter (predicate : 'a -> bool) (set : OriginalSet<'a>) = 
-        let a, b, c = toSeq set, set.Set(), set.List()
-        OriginalSet(Seq.filter predicate a, Set.filter predicate b, c)
+//        let a, b, c = toSeq set, set.Set(), set.List()
+        OriginalSet(LazyList.filter predicate (set.List()), Set.filter predicate (set.Set()))
     
     let fold (folder : 's -> 't -> 's) (state : 's) (set : OriginalSet<'t>) = 
         set.List()
-        |> List.ofSeq
-        |> Seq.ofList
-        |> Seq.fold folder state
+        |> LazyList.fold folder state
+//        |> List.ofSeq
+//        |> Seq.ofList
+//        |> Seq.fold folder state
     
     //        let a = set |> toSeq |> Seq.fold folder state
     //        let b = Set.ofSeq a
