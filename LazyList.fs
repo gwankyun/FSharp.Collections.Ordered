@@ -55,3 +55,8 @@ module LazyList =
     let ofSeq (elements : 'a seq) = 
         elements
         |> makeLazyListFromSeq
+
+    let partition (predicate : 'a -> bool) (list : LazyList<'a>) =
+        let list1 = filter predicate list
+        let list2 = filter (fun x -> not(predicate x)) list
+        (list1, list2)
