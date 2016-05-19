@@ -29,7 +29,7 @@ module LazyList =
     let empty<'a> = LazyList<'a>(Seq.empty, List.empty)
 
     let toSeq (list : LazyList<'a>) =
-        list.Seq() |> Seq.rev
+        lazy (list.Seq() |> Seq.rev)
 
     let fold (folder : 's -> 't -> 's) (state : 's) (list : LazyList<'t>) = 
         list
