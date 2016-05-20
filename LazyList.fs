@@ -52,10 +52,11 @@ module LazyList =
         |> ofSeq
     
     let ofList (elements : 'a list) = 
-        elements
-        |> Seq.ofList
-        |> Seq.rev
-        |> ofSeq
+        LazyList(elements
+         |> List.rev)
+//        |> Seq.ofList
+//        |> Seq.rev
+//        |> ofSeq
     
     let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
         //        let list1 = filter predicate list
