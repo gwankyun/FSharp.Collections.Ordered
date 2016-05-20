@@ -147,7 +147,10 @@ module OriginalMultiMap =
             | Some(x) -> false
             | None -> true) table1
     
-//    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) = 
+    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.groupBy (fun (a, b) -> projection a b)
 //        let t = 
 //            table |> fold (fun s a b -> 
 //                         let key = projection a b
