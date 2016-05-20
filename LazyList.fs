@@ -17,7 +17,10 @@ module LazyList =
     //    let makeLazyListFromSeq (seq : 'a seq) = 
     //        let ls = List.ofSeq seq
     //        LazyList(seq, ls)
-    let ofSeq (elements : 'a seq) = LazyList(elements |> Seq.rev |> List.ofSeq)
+    let ofSeq (elements : 'a seq) = 
+        LazyList(elements
+                 |> Seq.rev
+                 |> List.ofSeq)
     
     let toSeq (list : LazyList<'a>) = 
         lazy (list.List()
@@ -31,10 +34,11 @@ module LazyList =
     
     let filter (predicate : 'a -> bool) (list : LazyList<'a>) = 
         let seq = (toSeq list).Value |> Seq.filter predicate
+        seq |> ofSeq
         //        makeLazyListFromSeq seq
-        LazyList(seq
-                 |> Seq.rev
-                 |> List.ofSeq)
+//        LazyList(seq
+//                 |> Seq.rev
+//                 |> List.ofSeq)
     
     let empty<'a> = LazyList<'a>(List.empty)
     
@@ -51,13 +55,11 @@ module LazyList =
         |> Seq.rev
         |> ofSeq
     
-    let ofList (elements : 'a list) = 
-        LazyList(elements
-         |> List.rev)
-//        |> Seq.ofList
-//        |> Seq.rev
-//        |> ofSeq
+    let ofList (elements : 'a list) = LazyList(elements |> List.rev)
     
+    //        |> Seq.ofList
+    //        |> Seq.rev
+    //        |> ofSeq
     let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
         //        let list1 = filter predicate list
         //        let list2 = filter (fun x -> not (predicate x)) list
