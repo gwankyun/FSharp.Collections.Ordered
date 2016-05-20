@@ -108,8 +108,8 @@ module OriginalSet =
         |> Array.ofSeq
     
     let toList (set : OriginalSet<'a>) = 
-        set
-        |> toSeq
+        (set
+        |> toSeq).Value
         |> List.ofSeq
     
     let union (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = 
