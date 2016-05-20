@@ -147,13 +147,13 @@ module OriginalMultiMap =
             | Some(x) -> false
             | None -> true) table1
     
-    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) = 
-        let t = 
-            table |> fold (fun s a b -> 
-                         let key = projection a b
-                         add key (a, b) s) empty
-        t.OriginalMap() |> OriginalMap.map (fun k v -> 
-                               (k, 
-                                v.Seq()
-//                                |> Seq.map Tuple.second
-                               ))
+//    let groupBy (projection : 'a -> 'b -> 'key) (table : OriginalMultiMap<'a, 'b>) = 
+//        let t = 
+//            table |> fold (fun s a b -> 
+//                         let key = projection a b
+//                         add key (a, b) s) empty
+//        t.OriginalMap() |> OriginalMap.map (fun k v -> 
+//                               (k, 
+//                                v.Seq()
+////                                |> Seq.map Tuple.second
+//                               ))
