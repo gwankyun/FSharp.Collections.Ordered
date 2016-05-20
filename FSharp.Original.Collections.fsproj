@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2c4c5c00-012c-42d8-8502-cf88515e6f20}</ProjectGuid>
+    <ProjectGuid>cfd7b82a-702e-4ef1-b40a-4e302d4a75da</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.Original.Collections</RootNamespace>
     <AssemblyName>FSharp.Original.Collections</AssemblyName>
