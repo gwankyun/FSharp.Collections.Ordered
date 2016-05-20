@@ -50,3 +50,6 @@ module LazyList =
     let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
         let list1, list2 = (list |> toSeq).Value |> Seq.partition predicate
         (ofSeq list1, ofSeq list2)
+
+    let iter (action : 'a -> unit) (list : LazyList<'a>) = 
+        Seq.iter action (list.List() |> List.rev)
