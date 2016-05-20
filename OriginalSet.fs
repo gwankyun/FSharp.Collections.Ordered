@@ -103,8 +103,8 @@ module OriginalSet =
     let singleton (value : 'a when 'a : comparison) = add value (OriginalSet<'a>(LazyList.empty, Set.empty))
     
     let toArray (set : OriginalSet<'a>) = 
-        set
-        |> toSeq
+        (set
+        |> toSeq).Value
         |> Array.ofSeq
     
     let toList (set : OriginalSet<'a>) = 
