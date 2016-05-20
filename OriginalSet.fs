@@ -69,9 +69,8 @@ module OriginalSet =
     let isSuperset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = Set.isSuperset (set1.Set()) (set2.Set())
     
     let iter (action : 'a -> unit) (set : OriginalSet<'a>) = 
-        set
-        |> toSeq
-        |> Seq.iter action
+        set.List()
+        |> LazyList.iter action
     
     let map (mapping : 'a -> 'b) (set : OriginalSet<'a>) = 
         OriginalSet(LazyList.map mapping (set.List()), Set.map mapping (set.Set()))
