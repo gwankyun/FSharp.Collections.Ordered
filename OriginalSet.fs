@@ -9,17 +9,6 @@ type OriginalSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) =
     member this.Set() = y
     member this.List() = x
 
-//    interface System.Collections.IEnumerable with
-//        member this.GetEnumerator() =
-//            (this.Seq()
-//    interface System.Collections.IEnumerable with
-//        member this.GetEnumerator() =
-//            this.Seq().GetEnumerator()
-//    interface System.IComparable with
-//        member this.CompareTo(that : obj) =
-//            let that = that :?> OriginalSet<'a>
-//            compare (this.Seq()) (that.Seq())
-//    override Object.Equals(that : obj) =
 module OriginalSet = 
     let add (value : 'a) (set : OriginalSet<'a>) = 
         let a, b = set.List(), set.Set()
@@ -39,21 +28,8 @@ module OriginalSet =
         //        let a, b, c = toSeq set, set.Set(), set.List()
         OriginalSet(LazyList.filter predicate (set.List()), Set.filter predicate (set.Set()))
     let fold (folder : 's -> 't -> 's) (state : 's) (set : OriginalSet<'t>) = set.List() |> LazyList.fold folder state
-    //        |> List.ofSeq
-    //        |> Seq.ofList
-    //        |> Seq.fold folder state
-    //        let a = set |> toSeq |> Seq.fold folder state
-    //        let b = Set.ofSeq a
-    //        OriginalSet(a, b)
     let foldBack (folder : 't -> 's -> 's) (set : OriginalSet<'t>) (state : 's) = 
         LazyList.foldBack folder (set.List()) state
-    //        set.List()
-    //        |> List.ofSeq
-    //        |> Seq.ofList
-    //        |> (fun x -> Seq.foldBack folder x state)
-    //        let a = Seq.foldBack folder (toSeq set) state
-    //        let b = Set.ofSeq a
-    //        OriginalSet(a, b)
     let forall (predicate : 'a -> bool) (set : OriginalSet<'a>) = Set.forall predicate (set.Set())
     let intersect (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = filter (fun x -> exists ((=) x) set2) set1
     
@@ -89,10 +65,7 @@ module OriginalSet =
         OriginalSet(list, set)
     
     let partition (predicate : 'a -> bool) (set : OriginalSet<'a>) = 
-        let sq1, sq2 = 
-            (set
-            |> toSeq).Value
-            |> Seq.partition predicate
+        let sq1, sq2 = (set |> toSeq).Value |> Seq.partition predicate
         ofSeq sq1, ofSeq sq2
     
     let remove (value : 'a) (set : OriginalSet<'a>) = Set.remove value (set.Set())
