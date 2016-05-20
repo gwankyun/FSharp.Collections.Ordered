@@ -90,10 +90,10 @@ module OriginalSet =
     
     let partition (predicate : 'a -> bool) (set : OriginalSet<'a>) = 
         let sq1, sq2 = 
-            set
-            |> toSeq
+            (set
+            |> toSeq).Value
             |> Seq.partition predicate
-        Set.ofSeq sq1, Set.ofSeq sq2
+        ofSeq sq1, ofSeq sq2
     
     let remove (value : 'a) (set : OriginalSet<'a>) = Set.remove value (set.Set())
     let singleton (value : 'a when 'a : comparison) = add value (OriginalSet<'a>(LazyList.empty, Set.empty))
