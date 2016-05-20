@@ -20,7 +20,7 @@ module OriginalMultiMap =
         OriginalMultiMap(v)
     
     let empty<'a, 'b when 'a : comparison and 'b : comparison> = 
-        let m : OriginalMap<'a, OriginalSet<'b>> = OriginalMap(Seq.empty, Map.empty)
+        let m : OriginalMap<'a, OriginalSet<'b>> = OriginalMap(LazyList.empty, Map.empty)
         OriginalMultiMap<'a, 'b>(m)
     
     let iter (action : 'a -> 'b -> unit) (table : OriginalMultiMap<'a, 'b>) = 
