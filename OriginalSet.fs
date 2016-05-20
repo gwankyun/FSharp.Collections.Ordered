@@ -67,11 +67,7 @@ module OriginalSet =
         Set.isProperSuperset (set1.Set()) (set2.Set())
     let isSubset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = Set.isSubset (set1.Set()) (set2.Set())
     let isSuperset (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = Set.isSuperset (set1.Set()) (set2.Set())
-    
-    let iter (action : 'a -> unit) (set : OriginalSet<'a>) = 
-        set.List()
-        |> LazyList.iter action
-    
+    let iter (action : 'a -> unit) (set : OriginalSet<'a>) = set.List() |> LazyList.iter action
     let map (mapping : 'a -> 'b) (set : OriginalSet<'a>) = 
         OriginalSet(LazyList.map mapping (set.List()), Set.map mapping (set.Set()))
     let maxElement (set : OriginalSet<'a>) = Set.maxElement (set.Set())
@@ -101,20 +97,14 @@ module OriginalSet =
     
     let remove (value : 'a) (set : OriginalSet<'a>) = Set.remove value (set.Set())
     let singleton (value : 'a when 'a : comparison) = add value (OriginalSet<'a>(LazyList.empty, Set.empty))
-    
-    let toArray (set : OriginalSet<'a>) = 
-        (set
-        |> toSeq).Value
-        |> Array.ofSeq
-    
-    let toList (set : OriginalSet<'a>) = 
-        (set
-        |> toSeq).Value
-        |> List.ofSeq
+    let toArray (set : OriginalSet<'a>) = (set |> toSeq).Value |> Array.ofSeq
+    let toList (set : OriginalSet<'a>) = (set |> toSeq).Value |> List.ofSeq
     
     let union (set1 : OriginalSet<'a>) (set2 : OriginalSet<'a>) = 
         let mutable set : OriginalSet<'a> = empty
-        for i in (Seq.append (toSeq set1) (toSeq set2)) do
+        for i in (toSeq set1).Value do
+            set <- add i set
+        for i in (toSeq set2).Value do
             set <- add i set
         set
     
