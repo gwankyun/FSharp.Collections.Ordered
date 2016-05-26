@@ -49,7 +49,7 @@
     <Compile Include="LazyList.fs" />
     <Compile Include="LinkedSet.fs" />
     <Compile Include="LinkedMap.fs" />
-    <Compile Include="OriginalMultiMap.fs" />
+    <Compile Include="LinkedMultiMap.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Extension\FSharp.Extension.fsproj">
