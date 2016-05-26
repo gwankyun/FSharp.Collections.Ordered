@@ -4,11 +4,11 @@ open System.Collections.Generic
 open Extension
 
 type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedMap<'a, LinkedSet<'b>>) = 
-    member this.OriginalMap() = x
+    member this.LinkedMap() = x
 
 module LinkedMultiMap = 
     let add (key : 'a) (value : 'b) (table : LinkedMultiMap<'a, 'b>) = 
-        let m = table.OriginalMap()
+        let m = table.LinkedMap()
         
         let v = 
             match LinkedMap.tryFind key m with
@@ -24,7 +24,7 @@ module LinkedMultiMap =
         LinkedMultiMap<'a, 'b>(m)
     
     let iter (action : 'a -> 'b -> unit) (table : LinkedMultiMap<'a, 'b>) = 
-        let m = table.OriginalMap()
+        let m = table.LinkedMap()
         LinkedMap.iter (fun k v -> LinkedSet.iter (fun i -> action k i) v) m
     
     let (+) (set1 : LinkedMultiMap<'a, 'b>) (set2 : LinkedMultiMap<'a, 'b>) = 
@@ -33,28 +33,28 @@ module LinkedMultiMap =
         set
     
     let containsKey (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.containsKey key map
     
     let exists (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.exists (fun k v -> LinkedSet.exists (predicate k) v) map
     
     let find (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         if containsKey key table then raise (KeyNotFoundException())
         else LinkedMap.find key map
     
     let findkey (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.findKey (fun k v -> LinkedSet.exists (predicate k) v) map
     
     let forall (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.forall (fun k v -> LinkedSet.forall (predicate k) v) map
     
     let isEmpty (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.isEmpty map
     
     let map (mapping : 'a -> 'b -> 'c) (table : LinkedMultiMap<'a, 'b>) = 
@@ -63,7 +63,7 @@ module LinkedMultiMap =
         map
     
     let tryFind (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         LinkedMap.tryFind key map
     
     let ofSeq (elements : ('a * 'b) seq) = Seq.fold (fun s (k, v) -> add k v s) empty elements
@@ -81,12 +81,12 @@ module LinkedMultiMap =
     let remove (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
         match tryFind key table with
         | Some(v) -> 
-            let map = table.OriginalMap()
+            let map = table.LinkedMap()
             LinkedMultiMap(LinkedMap.remove key map)
         | None -> table
     
     let toSeq (table : LinkedMultiMap<'a, 'b>) = 
-        let m = table.OriginalMap()
+        let m = table.LinkedMap()
         let s = m.Seq()
         let mutable seq : ('a * 'b) list = List.empty
         iter (fun k v -> seq <- (k, v) :: seq) table
@@ -96,7 +96,7 @@ module LinkedMultiMap =
     
     let filter (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         let r = 
-            table.OriginalMap()
+            table.LinkedMap()
             |> LinkedMap.map (fun k v -> v |> LinkedSet.filter (predicate k))
             |> LinkedMap.filter (fun k v -> 
                    v
@@ -105,7 +105,7 @@ module LinkedMultiMap =
         LinkedMultiMap(r)
     
     let partition (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
-        let map = table.OriginalMap()
+        let map = table.LinkedMap()
         let map1 = filter predicate table
         let map2 = filter (fun k v -> not (predicate k v)) table
         map1, map2
