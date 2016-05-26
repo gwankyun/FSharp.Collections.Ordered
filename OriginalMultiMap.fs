@@ -3,7 +3,7 @@
 open System.Collections.Generic
 open Extension
 
-type OriginalMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : OriginalMap<'a, OriginalSet<'b>>) = 
+type OriginalMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : OriginalMap<'a, LinkedSet<'b>>) = 
     member this.OriginalMap() = x
 
 module OriginalMultiMap = 
@@ -15,17 +15,17 @@ module OriginalMultiMap =
             | Some(v) -> 
                 m
                 |> OriginalMap.remove key
-                |> OriginalMap.add key (OriginalSet.add value v)
-            | None -> OriginalMap.add key (OriginalSet.singleton value) m
+                |> OriginalMap.add key (LinkedSet.add value v)
+            | None -> OriginalMap.add key (LinkedSet.singleton value) m
         OriginalMultiMap(v)
     
     let empty<'a, 'b when 'a : comparison and 'b : comparison> = 
-        let m : OriginalMap<'a, OriginalSet<'b>> = OriginalMap(LazyList.empty, Map.empty)
+        let m : OriginalMap<'a, LinkedSet<'b>> = OriginalMap(LazyList.empty, Map.empty)
         OriginalMultiMap<'a, 'b>(m)
     
     let iter (action : 'a -> 'b -> unit) (table : OriginalMultiMap<'a, 'b>) = 
         let m = table.OriginalMap()
-        OriginalMap.iter (fun k v -> OriginalSet.iter (fun i -> action k i) v) m
+        OriginalMap.iter (fun k v -> LinkedSet.iter (fun i -> action k i) v) m
     
     let (+) (set1 : OriginalMultiMap<'a, 'b>) (set2 : OriginalMultiMap<'a, 'b>) = 
         let mutable set = set1
@@ -38,7 +38,7 @@ module OriginalMultiMap =
     
     let exists (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
-        OriginalMap.exists (fun k v -> OriginalSet.exists (predicate k) v) map
+        OriginalMap.exists (fun k v -> LinkedSet.exists (predicate k) v) map
     
     let find (key : 'a) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
@@ -47,11 +47,11 @@ module OriginalMultiMap =
     
     let findkey (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
-        OriginalMap.findKey (fun k v -> OriginalSet.exists (predicate k) v) map
+        OriginalMap.findKey (fun k v -> LinkedSet.exists (predicate k) v) map
     
     let forall (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
-        OriginalMap.forall (fun k v -> OriginalSet.forall (predicate k) v) map
+        OriginalMap.forall (fun k v -> LinkedSet.forall (predicate k) v) map
     
     let isEmpty (table : OriginalMultiMap<'a, 'b>) = 
         let map = table.OriginalMap()
@@ -97,10 +97,10 @@ module OriginalMultiMap =
     let filter (predicate : 'a -> 'b -> bool) (table : OriginalMultiMap<'a, 'b>) = 
         let r = 
             table.OriginalMap()
-            |> OriginalMap.map (fun k v -> v |> OriginalSet.filter (predicate k))
+            |> OriginalMap.map (fun k v -> v |> LinkedSet.filter (predicate k))
             |> OriginalMap.filter (fun k v -> 
                    v
-                   |> OriginalSet.isEmpty
+                   |> LinkedSet.isEmpty
                    |> not)
         OriginalMultiMap(r)
     
