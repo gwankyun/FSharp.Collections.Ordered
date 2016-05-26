@@ -5,14 +5,14 @@ F#的可以記住插入順序的集合
 
 目前有：
 
-1. OriginalSet
+1. LinkedSet
 	
-	實現Set模塊函數，OriginalSet<'a>相當於'a seq * Set<'a>
+	實現Set模塊函數，LinkedSet<'a>相當於'a seq * Set<'a>
 
-2. OriginalMap
+2. LinkedMap
 
-	實現Map模塊函數,OriginalMap<'a, 'b>相當於'a seq * Map<'a, 'b>
+	實現Map模塊函數,LinkedMap<'a, 'b>相當於'a seq * Map<'a, 'b>
 
-3. OriginalMultiMap
+3. LinkedMultiMap
 
-	OriginalMultiMap<'a, 'b>相當於OriginalMap<'a, OriginalSet<'b>>
+	LinkedMultiMap<'a, 'b>相當於LinkedMap<'a, LinkedSet<'b>>
