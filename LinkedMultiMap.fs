@@ -148,15 +148,6 @@ module LinkedMultiMap =
             | None -> true) table1
     
     let groupBy (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Seq.groupBy (fun (a, b) -> projection a b)
-//        let t = 
-//            table |> fold (fun s a b -> 
-//                         let key = projection a b
-//                         add key (a, b) s) empty
-//        t.OriginalMap() |> OriginalMap.map (fun k v -> 
-//                               (k, 
-//                                v.Seq()
-////                                |> Seq.map Tuple.second
-//                               ))
+        table |> fold (fun s k v -> 
+                     let key = projection k v
+                     s |> add key (k, v)) empty
