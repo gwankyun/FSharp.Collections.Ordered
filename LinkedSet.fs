@@ -1,9 +1,10 @@
-﻿namespace Original.Collections
+﻿namespace FSharp.Collections
 
 open System.Collections.Generic
 open System.Collections
 open System
 open Extension
+open FSharp.Collections
 
 type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
     member this.Set() = y

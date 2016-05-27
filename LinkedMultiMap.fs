@@ -2,6 +2,7 @@
 
 open System.Collections.Generic
 open Extension
+open FSharp.Collections
 
 type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedMap<'a, LinkedSet<'b>>) = 
     member this.LinkedMap() = x

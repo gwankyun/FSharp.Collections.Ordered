@@ -1,7 +1,8 @@
-﻿namespace Original.Collections
+﻿namespace FSharp.Collections
 
 open System.Collections.Generic
 open Extension
+open FSharp.Collections
 
 type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
     member this.Seq() = x
