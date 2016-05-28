@@ -52,3 +52,6 @@ module LazyList =
         (ofSeq list1, ofSeq list2)
     
     let iter (action : 'a -> unit) (list : LazyList<'a>) = Seq.iter action (list.List() |> List.rev)
+
+    let length (list : LazyList<'a>) =
+        List.length (list.List())

@@ -97,3 +97,8 @@ module LinkedMap =
         let map = Map.difference m1 m2
         let seq = LazyList.filter (fun x -> Map.containsKey x map) s1
         LinkedMap(seq, map)
+
+//    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
+//        table
+//        |> Seq.sortBy (fun (k, v) -> projection k v)
+//        |> ofSeq

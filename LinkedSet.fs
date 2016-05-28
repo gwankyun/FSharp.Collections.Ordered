@@ -20,35 +20,83 @@ module LinkedSet =
             LinkedSet(list, b.Add(value))
     
     let contains (value : 'a) (set : LinkedSet<'a>) = Set.contains value (set.Set())
-    let count (set : LinkedSet<'a>) = Set.count (set.Set())
-    let difference (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = set1.Set() - set2.Set()
+    
+    let count (set : LinkedSet<'a>) = 
+        let list = set.List()
+        LazyList.length list
+    
+    let difference (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
+        let set1 = set1.Set()
+        let set2 = set2.Set()
+        set1 - set2
+    
     let empty<'a when 'a : comparison> = LinkedSet<'a>(LazyList.empty, Set.empty)
-    let exists (predicate : 'a -> bool) (set : LinkedSet<'a>) = Set.exists predicate (set.Set())
-    let toSeq (set : LinkedSet<'a>) = set.List() |> LazyList.toSeq
+    
+    let exists (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.exists predicate set
+    
+    let toSeq (set : LinkedSet<'a>) = 
+        let list = set.List()
+        list |> LazyList.toSeq
+    
     let filter (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
-        //        let a, b, c = toSeq set, set.Set(), set.List()
-        LinkedSet(LazyList.filter predicate (set.List()), Set.filter predicate (set.Set()))
-    let fold (folder : 's -> 't -> 's) (state : 's) (set : LinkedSet<'t>) = set.List() |> LazyList.fold folder state
+        let list, set = set.List(), set.Set()
+        LinkedSet(LazyList.filter predicate list, Set.filter predicate set)
+    
+    let fold (folder : 's -> 't -> 's) (state : 's) (set : LinkedSet<'t>) = 
+        let list = set.List()
+        list |> LazyList.fold folder state
+    
     let foldBack (folder : 't -> 's -> 's) (set : LinkedSet<'t>) (state : 's) = 
-        LazyList.foldBack folder (set.List()) state
-    let forall (predicate : 'a -> bool) (set : LinkedSet<'a>) = Set.forall predicate (set.Set())
+        let list = set.List()
+        LazyList.foldBack folder list state
+    
+    let forall (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.forall predicate set
+    
     let intersect (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = filter (fun x -> exists ((=) x) set2) set1
     
     let intersectMany (sets : LinkedSet<'a> seq) = 
         let head, tail = Seq.head sets, Seq.tail sets
         filter (fun x -> Seq.forall (exists ((=) x)) tail) head
     
-    let isEmpty (set : LinkedSet<'a>) = Set.isEmpty (set.Set())
-    let isProperSubset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = Set.isProperSubset (set1.Set()) (set2.Set())
+    let isEmpty (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.isEmpty set
+    
+    let isProperSubset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
+        let set1, set2 = set1.Set(), set2.Set()
+        Set.isProperSubset set1 set2
+    
     let isProperSuperset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
-        Set.isProperSuperset (set1.Set()) (set2.Set())
-    let isSubset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = Set.isSubset (set1.Set()) (set2.Set())
-    let isSuperset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = Set.isSuperset (set1.Set()) (set2.Set())
-    let iter (action : 'a -> unit) (set : LinkedSet<'a>) = set.List() |> LazyList.iter action
+        let set1, set2 = set1.Set(), set2.Set()
+        Set.isProperSuperset set1 set2
+    
+    let isSubset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
+        let set1, set2 = set1.Set(), set2.Set()
+        Set.isSubset set1 set2
+    
+    let isSuperset (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
+        let set1, set2 = set1.Set(), set2.Set()
+        Set.isSuperset set1 set2
+    
+    let iter (action : 'a -> unit) (set : LinkedSet<'a>) = 
+        let list = set.List()
+        list |> LazyList.iter action
+    
     let map (mapping : 'a -> 'b) (set : LinkedSet<'a>) = 
-        LinkedSet(LazyList.map mapping (set.List()), Set.map mapping (set.Set()))
-    let maxElement (set : LinkedSet<'a>) = Set.maxElement (set.Set())
-    let minElement (set : LinkedSet<'a>) = Set.minElement (set.Set())
+        let list, set = set.List(), set.Set()
+        LinkedSet(LazyList.map mapping list, Set.map mapping set)
+    
+    let maxElement (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.maxElement set
+    
+    let minElement (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.minElement set
     
     let ofArray (array : 'a []) = 
         let list = LazyList.ofArray array
@@ -69,7 +117,10 @@ module LinkedSet =
         let sq1, sq2 = (set |> toSeq).Value |> Seq.partition predicate
         ofSeq sq1, ofSeq sq2
     
-    let remove (value : 'a) (set : LinkedSet<'a>) = Set.remove value (set.Set())
+    let remove (value : 'a) (set : LinkedSet<'a>) = 
+        let set = set.Set()
+        Set.remove value set
+    
     let singleton (value : 'a when 'a : comparison) = add value (LinkedSet<'a>(LazyList.empty, Set.empty))
     let toArray (set : LinkedSet<'a>) = (set |> toSeq).Value |> Array.ofSeq
     let toList (set : LinkedSet<'a>) = (set |> toSeq).Value |> List.ofSeq
