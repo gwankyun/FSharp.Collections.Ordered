@@ -75,19 +75,24 @@ module LinkedMap =
         let seq, map = table.Seq() |> LazyList.filter ((=) key), table.Map() |> Map.remove key
         LinkedMap(seq, map)
     
-    let toSeq (table : LinkedMap<'a, 'b>) = 
+    let _toSeq (table : LinkedMap<'a, 'b>) = 
         let seq = table.Seq()
         seq
         |> LazyList.map (fun x -> (x, find x table))
         |> LazyList.toSeq
+
+    let toSeq (table : LinkedMap<'a, 'b>) = 
+        table
+        |> _toSeq
+        |> (fun x -> x.Value)
     
-    let toArray (table : LinkedMap<'a, 'b>) = (table |> toSeq).Value |> Array.ofSeq
-    let toList (table : LinkedMap<'a, 'b>) = (table |> toSeq).Value |> List.ofSeq
+    let toArray (table : LinkedMap<'a, 'b>) = (table |> _toSeq).Value |> Array.ofSeq
+    let toList (table : LinkedMap<'a, 'b>) = (table |> _toSeq).Value |> List.ofSeq
     let tryFind (key : 'a) (table : LinkedMap<'a, 'b>) = Map.tryFind key (table.Map())
     let tryFindKey (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = Map.tryFindKey predicate (table.Map())
     
     let tryPick (chooser : 'a -> 'b -> 'c option) (table : LinkedMap<'a, 'b>) = 
-        let seq, map = toSeq table, table.Map()
+        let seq, map = _toSeq table, table.Map()
         Seq.tryPick (fun x -> chooser x map.[x])
     
     let difference (table1 : LinkedMap<'a, 'b>) (table2 : LinkedMap<'a, 'b>) = 
@@ -100,5 +105,11 @@ module LinkedMap =
 
 //    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
 //        table
+//        |> Seq.sortBy (fun (k, v) -> projection k v)
+//        |> ofSeq
+
+//    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
+//        table
+//        |> toSeq
 //        |> Seq.sortBy (fun (k, v) -> projection k v)
 //        |> ofSeq

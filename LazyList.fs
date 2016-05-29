@@ -17,27 +17,45 @@ module LazyList =
                  |> Seq.rev
                  |> List.ofSeq)
     
-    let toSeq (list : LazyList<'a>) = 
+    let _toSeq (list : LazyList<'a>) = 
         lazy (list.List()
               |> List.toSeq
               |> Seq.rev)
     
+    let toSeq (list : LazyList<'a>) = 
+        list
+        |> _toSeq
+        |> (fun x -> x.Value)
+    
     let map (mapping : 'a -> 'b) (list : LazyList<'a>) = 
-        let seq = (toSeq list).Value |> Seq.map mapping
-        seq |> ofSeq
+        list.List()
+        |> Seq.ofList
+        |> Seq.map mapping
+        |> Seq.toList
+        |> (fun x -> LazyList(x))
     
     let filter (predicate : 'a -> bool) (list : LazyList<'a>) = 
-        let seq = (toSeq list).Value |> Seq.filter predicate
-        seq |> ofSeq
+        list.List()
+        |> Seq.ofList
+        |> Seq.filter predicate
+        |> Seq.toList
+        |> (fun x -> LazyList(x))
     
     let empty<'a> = LazyList<'a>(List.empty)
     
     let fold (folder : 's -> 't -> 's) (state : 's) (list : LazyList<'t>) = 
-        let force = (list |> toSeq).Value
+        let force = 
+            list.List()
+            |> Seq.ofList
+            |> Seq.rev
         force |> Seq.fold folder state
     
     let foldBack (folder : 't -> 's -> 's) (list : LazyList<'t>) (state : 's) = 
-        list |> fold (fun s t -> folder t s) state
+        let force = 
+            list.List()
+            |> Seq.ofList
+            |> Seq.rev
+        Seq.foldBack folder force state
     
     let ofArray (array : 'a []) = 
         array
@@ -48,10 +66,8 @@ module LazyList =
     let ofList (elements : 'a list) = LazyList(elements |> List.rev)
     
     let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
-        let list1, list2 = (list |> toSeq).Value |> Seq.partition predicate
+        let list1, list2 = (list |> _toSeq).Value |> Seq.partition predicate
         (ofSeq list1, ofSeq list2)
     
-    let iter (action : 'a -> unit) (list : LazyList<'a>) = Seq.iter action (list.List() |> List.rev)
-
-    let length (list : LazyList<'a>) =
-        List.length (list.List())
+    let iter (action : 'a -> unit) (list : LazyList<'a>) = (list.List() |> List.rev) |> Seq.iter action
+    let length (list : LazyList<'a>) = list.List() |> List.length
