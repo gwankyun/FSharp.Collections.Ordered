@@ -170,3 +170,4 @@ module LinkedSet =
         table |> fold (fun (s : LinkedMap<'key, 'a>) t -> 
                      let key = projection t
                      s.Add(key, t)) (LinkedMap<'key, 'a>.Empty())
+

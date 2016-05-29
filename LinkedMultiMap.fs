@@ -181,3 +181,5 @@ module LinkedMultiMap =
         |> toSeq
         |> Seq.sortBy (fun (k, v) -> projection k v)
         |> ofSeq
+
+    let length (table : LinkedMultiMap<'a, 'b>) = table.LinkedMap() |> LinkedMap.length

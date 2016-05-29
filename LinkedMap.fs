@@ -110,12 +110,44 @@ module LinkedMap =
         let map = Map.difference m1 m2
         let seq = LazyList.filter (fun x -> Map.containsKey x map) s1
         LinkedMap(seq, map)
-//    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
-//        table
-//        |> Seq.sortBy (fun (k, v) -> projection k v)
-//        |> ofSeq
-//    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
-//        table
-//        |> toSeq
-//        |> Seq.sortBy (fun (k, v) -> projection k v)
-//        |> ofSeq
+    
+    //    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
+    //        table
+    //        |> Seq.sortBy (fun (k, v) -> projection k v)
+    //        |> ofSeq
+    //    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
+    //        table
+    //        |> toSeq
+    //        |> Seq.sortBy (fun (k, v) -> projection k v)
+    //        |> ofSeq
+    let sort (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.sort
+        |> ofSeq
+    
+    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.sortBy (fun (k, v) -> projection k v)
+        |> ofSeq
+    
+    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
+        |> ofSeq
+    
+    let sortDescending (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.sort
+        |> ofSeq
+    
+    let sortByDescending (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.sortBy (fun (k, v) -> projection k v)
+        |> ofSeq
+    
+    let length (table : LinkedMap<'a, 'b>) = table.List() |> LazyList.length
