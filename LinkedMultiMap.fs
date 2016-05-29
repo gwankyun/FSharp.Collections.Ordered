@@ -88,7 +88,7 @@ module LinkedMultiMap =
     
     let toSeq (table : LinkedMultiMap<'a, 'b>) = 
         let m = table.LinkedMap()
-        let s = m.Seq()
+        let s = m.List()
         let mutable seq : ('a * 'b) list = List.empty
         iter (fun k v -> seq <- (k, v) :: seq) table
         seq

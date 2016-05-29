@@ -10,6 +10,10 @@ type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) =
     member this.Set() = y
     member this.List() = x
 
+type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
+    member this.Seq() = x
+    member this.Map() = y
+
 module LinkedSet = 
     let add (value : 'a) (set : LinkedSet<'a>) = 
         let a, b = set.List(), set.Set()
@@ -141,3 +145,9 @@ module LinkedSet =
             set2
             |> exists ((=) x)
             |> not) set1
+
+//    let groupBy (projection : 'a -> 'key) (table : LinkedSet<'a>) = 
+//        table |> fold (fun s t -> 
+//                     let key = projection t
+//                     s |> add key key) LinkedMap
+//              |> (fun x -> x.LinkedMap())
