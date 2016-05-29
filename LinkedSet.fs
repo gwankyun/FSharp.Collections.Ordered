@@ -11,8 +11,17 @@ type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) =
     member this.List() = x
 
 type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
-    member this.Seq() = x
+    member this.List() = x
     member this.Map() = y
+    static member Empty<'a, 'b when 'a : comparison and 'b : comparison>() = 
+        LinkedMap<'a, 'b>(LazyList.empty, Map.empty)
+    member this.Add(key : 'a, value : 'b) = 
+        let a, b = this.List(), this.Map()
+        let seq = a.Cons(key)
+        LinkedMap(seq, b.Add(key, value))
+
+type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedMap<'a, LinkedSet<'b>>) = 
+    member this.LinkedMap() = x
 
 module LinkedSet = 
     let add (value : 'a) (set : LinkedSet<'a>) = 
@@ -118,7 +127,10 @@ module LinkedSet =
         LinkedSet(list, set)
     
     let partition (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
-        let sq1, sq2 = set |> toSeq |> Seq.partition predicate
+        let sq1, sq2 = 
+            set
+            |> toSeq
+            |> Seq.partition predicate
         ofSeq sq1, ofSeq sq2
     
     let remove (value : 'a) (set : LinkedSet<'a>) = 
@@ -126,8 +138,16 @@ module LinkedSet =
         Set.remove value set
     
     let singleton (value : 'a when 'a : comparison) = add value (LinkedSet<'a>(LazyList.empty, Set.empty))
-    let toArray (set : LinkedSet<'a>) = set |> toSeq |> Array.ofSeq
-    let toList (set : LinkedSet<'a>) = set |> toSeq |> List.ofSeq
+    
+    let toArray (set : LinkedSet<'a>) = 
+        set
+        |> toSeq
+        |> Array.ofSeq
+    
+    let toList (set : LinkedSet<'a>) = 
+        set
+        |> toSeq
+        |> List.ofSeq
     
     let union (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
         let mutable set : LinkedSet<'a> = empty
@@ -145,9 +165,8 @@ module LinkedSet =
             set2
             |> exists ((=) x)
             |> not) set1
-
-//    let groupBy (projection : 'a -> 'key) (table : LinkedSet<'a>) = 
-//        table |> fold (fun s t -> 
-//                     let key = projection t
-//                     s |> add key key) LinkedMap
-//              |> (fun x -> x.LinkedMap())
+    
+    let groupBy (projection : 'a -> 'key) (table : LinkedSet<'a>) = 
+        table |> fold (fun (s : LinkedMap<'key, 'a>) t -> 
+                     let key = projection t
+                     s.Add(key, t)) (LinkedMap<'key, 'a>.Empty())

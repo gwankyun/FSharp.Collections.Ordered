@@ -4,10 +4,6 @@ open System.Collections.Generic
 open Extension
 open FSharp.Collections
 
-type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
-    member this.List() = x
-    member this.Map() = y
-
 module LinkedMap = 
     let add (key : 'a) (value : 'b) (set : LinkedMap<'a, 'b>) = 
         let a, b = set.List(), set.Map()

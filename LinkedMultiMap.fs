@@ -4,9 +4,6 @@ open System.Collections.Generic
 open Extension
 open FSharp.Collections
 
-type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedMap<'a, LinkedSet<'b>>) = 
-    member this.LinkedMap() = x
-
 module LinkedMultiMap = 
     let add (key : 'a) (value : 'b) (table : LinkedMultiMap<'a, 'b>) = 
         let m = table.LinkedMap()
@@ -149,36 +146,37 @@ module LinkedMultiMap =
             | None -> true) table1
     
     let groupBy (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
-        table |> fold (fun s k v -> 
-                     let key = projection k v
-                     s |> add key (k, v)) empty
-              |> (fun x -> x.LinkedMap())
-
+        table
+        |> fold (fun s k v -> 
+               let key = projection k v
+               s |> add key (k, v)) empty
+        |> (fun x -> x.LinkedMap())
+    
     let sort (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
         |> Seq.sort
         |> ofSeq
-
-    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) =
+    
+    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
         |> Seq.sortBy (fun (k, v) -> projection k v)
         |> ofSeq
-
-    let sortWith (comparer : 'a * 'b -> 'a * 'b -> int) (table : LinkedMultiMap<'a, 'b>) =
+    
+    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
         |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
         |> ofSeq
-
+    
     let sortDescending (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
         |> Seq.sort
         |> ofSeq
-
-    let sortByDescending (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) =
+    
+    let sortByDescending (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
         |> Seq.sortBy (fun (k, v) -> projection k v)
