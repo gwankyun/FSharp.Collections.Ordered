@@ -152,6 +152,7 @@ module LinkedMultiMap =
         table |> fold (fun s k v -> 
                      let key = projection k v
                      s |> add key (k, v)) empty
+              |> (fun x -> x.LinkedMap())
 
     let sort (table : LinkedMultiMap<'a, 'b>) = 
         table
