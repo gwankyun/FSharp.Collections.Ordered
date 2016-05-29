@@ -114,7 +114,7 @@ module LinkedSet =
         LinkedSet(list, set)
     
     let partition (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
-        let sq1, sq2 = (set |> toSeq).Value |> Seq.partition predicate
+        let sq1, sq2 = set |> toSeq |> Seq.partition predicate
         ofSeq sq1, ofSeq sq2
     
     let remove (value : 'a) (set : LinkedSet<'a>) = 
@@ -122,14 +122,14 @@ module LinkedSet =
         Set.remove value set
     
     let singleton (value : 'a when 'a : comparison) = add value (LinkedSet<'a>(LazyList.empty, Set.empty))
-    let toArray (set : LinkedSet<'a>) = (set |> toSeq).Value |> Array.ofSeq
-    let toList (set : LinkedSet<'a>) = (set |> toSeq).Value |> List.ofSeq
+    let toArray (set : LinkedSet<'a>) = set |> toSeq |> Array.ofSeq
+    let toList (set : LinkedSet<'a>) = set |> toSeq |> List.ofSeq
     
     let union (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
         let mutable set : LinkedSet<'a> = empty
-        for i in (toSeq set1).Value do
+        for i in toSeq set1 do
             set <- add i set
-        for i in (toSeq set2).Value do
+        for i in toSeq set2 do
             set <- add i set
         set
     
