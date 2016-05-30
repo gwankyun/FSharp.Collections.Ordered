@@ -7,6 +7,12 @@ open Extension
 open FSharp.Collections
 
 type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
+    
+    override this.ToString() = 
+        this.List()
+        |> LazyList.rev
+        |> (fun x -> x.ToString())
+    
     member this.Set() = y
     member this.List() = x
 
@@ -170,4 +176,3 @@ module LinkedSet =
         table |> fold (fun (s : LinkedMap<'key, 'a>) t -> 
                      let key = projection t
                      s.Add(key, t)) (LinkedMap<'key, 'a>.Empty())
-

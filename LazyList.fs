@@ -6,6 +6,12 @@ open System
 open Extension
 
 type LazyList<'a>(x : 'a list) = 
+    
+    override this.ToString() = 
+        this.List()
+        |> List.rev
+        |> (fun x -> x.ToString())
+    
     member this.List() = x
     member this.Cons(value : 'a) = 
         let ls = value :: this.List()
@@ -71,3 +77,8 @@ module LazyList =
     
     let iter (action : 'a -> unit) (list : LazyList<'a>) = (list.List() |> List.rev) |> Seq.iter action
     let length (list : LazyList<'a>) = list.List() |> List.length
+
+    let rev (list : LazyList<'a>) =
+        list.List()
+        |> List.rev
+        |> ofList

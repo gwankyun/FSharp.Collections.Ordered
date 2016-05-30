@@ -34,7 +34,7 @@
     <DocumentationFile>bin\Release\FSharp.Original.Collections.XML</DocumentationFile>
     <NoWarn>
     </NoWarn>
-    <OtherFlags>--sig:sig.fsi</OtherFlags>
+    <OtherFlags>--sig:$(OutputPath)sig.fsi</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
