@@ -32,6 +32,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Release\FSharp.Original.Collections.XML</DocumentationFile>
+    <NoWarn>
+    </NoWarn>
+    <OtherFlags>--sig:sig.fsi</OtherFlags>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -93,15 +93,19 @@ module LinkedMultiMap =
         |> Seq.rev
     
     let filter (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
-        let r = 
-            table.LinkedMap()
-            |> LinkedMap.map (fun k v -> v |> LinkedSet.filter (predicate k))
-            |> LinkedMap.filter (fun k v -> 
-                   v
-                   |> LinkedSet.isEmpty
-                   |> not)
-        LinkedMultiMap(r)
+        let mutable r = empty
+        table |> iter (fun k v -> 
+                     if predicate k v then r <- r |> add k v)
+        r
     
+    //        let r = 
+    //            table.LinkedMap()
+    //            |> LinkedMap.map (fun k v -> v |> LinkedSet.filter (predicate k))
+    //            |> LinkedMap.filter (fun k v -> 
+    //                   v
+    //                   |> LinkedSet.isEmpty
+    //                   |> not)
+    //        LinkedMultiMap(r)
     let partition (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         let map = table.LinkedMap()
         let map1 = filter predicate table
@@ -181,5 +185,5 @@ module LinkedMultiMap =
         |> toSeq
         |> Seq.sortBy (fun (k, v) -> projection k v)
         |> ofSeq
-
+    
     let length (table : LinkedMultiMap<'a, 'b>) = table.LinkedMap() |> LinkedMap.length
