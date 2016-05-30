@@ -10,8 +10,8 @@ type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) =
     
     override this.ToString() = 
         this.List()
-        |> LazyList.rev
-        |> (fun x -> x.ToString())
+        |> LazyList.filter (fun x -> this.Set() |> Set.contains x)
+        |> Member.toString
     
     member this.Set() = y
     member this.List() = x
