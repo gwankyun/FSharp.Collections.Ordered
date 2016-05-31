@@ -6,19 +6,14 @@ open System
 open Extension
 
 type LazyList<'a>(x : 'a list) = 
-    
-    override this.ToString() = 
-        this.ToList()
-        |> Member.toString
-    
+    override this.ToString() = this.ToList() |> Member.toString
     member this.List() = x
+    
     member this.Cons(value : 'a) = 
         let ls = value :: this.List()
         LazyList(ls)
-
-    member this.ToList() =
-        this.List()
-        |> List.rev
+    
+    member this.ToList() = this.List() |> List.rev
 
 module LazyList = 
     let ofSeq (elements : 'a seq) = 
@@ -50,40 +45,35 @@ module LazyList =
         |> (fun x -> LazyList(x))
     
     let empty<'a> = LazyList<'a>(List.empty)
+    let toList (list : LazyList<'a>) = list.ToList()
     
     let fold (folder : 's -> 't -> 's) (state : 's) (list : LazyList<'t>) = 
-        let force = 
-            list.List()
-            |> Seq.ofList
-            |> Seq.rev
-        force |> Seq.fold folder state
+        list
+        |> toList
+        |> List.fold folder state
     
     let foldBack (folder : 't -> 's -> 's) (list : LazyList<'t>) (state : 's) = 
-        let force = 
-            list.List()
-            |> Seq.ofList
-            |> Seq.rev
+        let force = list |> toSeq
         Seq.foldBack folder force state
-    
-    let ofArray (array : 'a []) = 
-        array
-        |> Seq.ofArray
-        |> Seq.rev
-        |> ofSeq
     
     let ofList (elements : 'a list) = LazyList(elements |> List.rev)
     
-//    let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
-//        let list1, list2 = (list |> _toSeq).Value |> Seq.partition predicate
-//        (ofSeq list1, ofSeq list2)
+    let ofArray (array : 'a []) = 
+        array
+        |> Array.toList
+        |> ofList
     
-    let iter (action : 'a -> unit) (list : LazyList<'a>) = (list.List() |> List.rev) |> Seq.iter action
+    //    let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
+    //        let list1, list2 = (list |> _toSeq).Value |> Seq.partition predicate
+    //        (ofSeq list1, ofSeq list2)
+    let iter (action : 'a -> unit) (list : LazyList<'a>) = 
+        list
+        |> toList
+        |> List.iter action
+    
     let length (list : LazyList<'a>) = list.List() |> List.length
     
     let rev (list : LazyList<'a>) = 
-        list.List()
-        |> List.rev
-        |> ofList
-
-    let toList (list : LazyList<'a>) =
-        list.ToList()
+        list
+        |> toList
+        |> (fun x -> LazyList(x))
