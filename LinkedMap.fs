@@ -66,11 +66,11 @@ module LinkedMap =
         let map = Map.ofSeq elements
         LinkedMap(seq, map)
     
-    let partition (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = 
-        let seq, map = table.List(), table.Map()
-        let seq1, seq2 = LazyList.partition (fun x -> predicate x map.[x]) seq
-        let map1, map2 = Map.partition predicate map
-        LinkedMap(seq1, map1), LinkedMap(seq2, map2)
+//    let partition (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = 
+//        let seq, map = table.List(), table.Map()
+//        let seq1, seq2 = LazyList.partition (fun x -> predicate x map.[x]) seq
+//        let map1, map2 = Map.partition predicate map
+//        LinkedMap(seq1, map1), LinkedMap(seq2, map2)
     
     let remove (key : 'a) (table : LinkedMap<'a, 'b>) = 
         let seq, map = table.List() |> LazyList.filter ((=) key), table.Map() |> Map.remove key

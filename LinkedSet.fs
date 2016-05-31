@@ -45,11 +45,11 @@ module LinkedSet =
         LazyList.length list
     
     let difference (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) =
-        let list1, list2 = set1.List(), set2.List() 
+        let list = set1.List()
         let set1 = set1.Set()
         let set2 = set2.Set()
         let set = set1 - set2
-        LinkedSet(list1 |> LazyList.filter (fun x -> set.Contains(x)), set)
+        LinkedSet(list |> LazyList.filter (fun x -> set.Contains(x)), set)
     
     let empty<'a when 'a : comparison> = LinkedSet<'a>(LazyList.empty, Set.empty)
     

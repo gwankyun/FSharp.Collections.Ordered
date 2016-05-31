@@ -8,14 +8,17 @@ open Extension
 type LazyList<'a>(x : 'a list) = 
     
     override this.ToString() = 
-        this.List()
-        |> List.rev
-        |> (fun x -> x.ToString())
+        this.ToList()
+        |> Member.toString
     
     member this.List() = x
     member this.Cons(value : 'a) = 
         let ls = value :: this.List()
         LazyList(ls)
+
+    member this.ToList() =
+        this.List()
+        |> List.rev
 
 module LazyList = 
     let ofSeq (elements : 'a seq) = 
@@ -23,16 +26,15 @@ module LazyList =
                  |> Seq.rev
                  |> List.ofSeq)
     
-    let _toSeq (list : LazyList<'a>) = 
-        lazy (list.List()
-              |> List.toSeq
-              |> Seq.rev)
-    
     let toSeq (list : LazyList<'a>) = 
-        list
-        |> _toSeq
-        |> (fun x -> x.Value)
+        list.List()
+        |> List.toSeq
+        |> Seq.rev
     
+    //    let toSeq (list : LazyList<'a>) = 
+    //        list
+    //        |> _toSeq
+    //        |> (fun x -> x.Value)
     let map (mapping : 'a -> 'b) (list : LazyList<'a>) = 
         list.List()
         |> Seq.ofList
@@ -71,14 +73,17 @@ module LazyList =
     
     let ofList (elements : 'a list) = LazyList(elements |> List.rev)
     
-    let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
-        let list1, list2 = (list |> _toSeq).Value |> Seq.partition predicate
-        (ofSeq list1, ofSeq list2)
+//    let partition (predicate : 'a -> bool) (list : LazyList<'a>) = 
+//        let list1, list2 = (list |> _toSeq).Value |> Seq.partition predicate
+//        (ofSeq list1, ofSeq list2)
     
     let iter (action : 'a -> unit) (list : LazyList<'a>) = (list.List() |> List.rev) |> Seq.iter action
     let length (list : LazyList<'a>) = list.List() |> List.length
-
-    let rev (list : LazyList<'a>) =
+    
+    let rev (list : LazyList<'a>) = 
         list.List()
         |> List.rev
         |> ofList
+
+    let toList (list : LazyList<'a>) =
+        list.ToList()
