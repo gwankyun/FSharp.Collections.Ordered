@@ -7,14 +7,20 @@ open Extension
 open FSharp.Collections
 
 type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
+    member this.Set() = y
+    member this.List() = x
     
     override this.ToString() = 
         this.List()
         |> LazyList.filter (fun x -> this.Set() |> Set.contains x)
+        |> LazyList.toList
         |> Member.toString
     
-    member this.Set() = y
-    member this.List() = x
+    member this.ToList() = 
+        let list, set = this.List(), this.Set()
+        list
+        |> LazyList.filter (fun x -> set.Contains(x))
+        |> LazyList.toList
 
 type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
     member this.List() = x
@@ -44,7 +50,7 @@ module LinkedSet =
         let list = set.List()
         LazyList.length list
     
-    let difference (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) =
+    let difference (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
         let list = set1.List()
         let set1 = set1.Set()
         let set2 = set2.Set()
@@ -66,11 +72,12 @@ module LinkedSet =
         LinkedSet(LazyList.filter predicate list, Set.filter predicate set)
     
     let fold (folder : 's -> 't -> 's) (state : 's) (set : LinkedSet<'t>) = 
-        let list = set.List()
-        list |> LazyList.fold folder state
+        set.List()
+        |> LazyList.filter (fun x -> set.Set().Contains(x))
+        |> LazyList.fold folder state
     
     let foldBack (folder : 't -> 's -> 's) (set : LinkedSet<'t>) (state : 's) = 
-        let list = set.List()
+        let list = set.List() |> LazyList.filter (fun x -> set.Set().Contains(x))
         LazyList.foldBack folder list state
     
     let forall (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
@@ -142,8 +149,8 @@ module LinkedSet =
         ofSeq sq1, ofSeq sq2
     
     let remove (value : 'a) (set : LinkedSet<'a>) = 
-        let set = set.Set()
-        Set.remove value set
+        let list, set = set.List(), set.Set()
+        LinkedSet(list, Set.remove value set)
     
     let singleton (value : 'a when 'a : comparison) = add value (LinkedSet<'a>(LazyList.empty, Set.empty))
     
@@ -152,10 +159,7 @@ module LinkedSet =
         |> toSeq
         |> Array.ofSeq
     
-    let toList (set : LinkedSet<'a>) = 
-        set
-        |> toSeq
-        |> List.ofSeq
+    let toList (set : LinkedSet<'a>) = set.ToList()
     
     let union (set1 : LinkedSet<'a>) (set2 : LinkedSet<'a>) = 
         let mutable set : LinkedSet<'a> = empty
