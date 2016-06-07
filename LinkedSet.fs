@@ -9,13 +9,7 @@ open FSharp.Collections
 type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
     member this.Set() = y
     member this.List() = x
-    
-    override this.ToString() = 
-        this.List()
-        |> LazyList.filter (fun x -> this.Set() |> Set.contains x)
-        |> LazyList.toList
-        |> Member.toString
-    
+    override this.ToString() = this.ToList() |> Member.toString
     member this.ToList() = 
         let list, set = this.List(), this.Set()
         list
@@ -27,13 +21,38 @@ type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) =
     member this.Map() = y
     static member Empty<'a, 'b when 'a : comparison and 'b : comparison>() = 
         LinkedMap<'a, 'b>(LazyList.empty, Map.empty)
+    
     member this.Add(key : 'a, value : 'b) = 
-        let a, b = this.List(), this.Map()
-        let seq = a.Cons(key)
-        LinkedMap(seq, b.Add(key, value))
+        let list, map = this.List(), this.Map()
+        let seq = list.Cons(key)
+        LinkedMap(seq, map.Add(key, value))
+    
+    member this.ToList() = 
+        let list, map = this.List(), this.Map()
+        list
+        |> LazyList.filter (fun x -> map.ContainsKey(x))
+        |> LazyList.toList
+        |> List.map (fun x -> (x, map.[x]))
+    
+    override this.ToString() = this.ToList() |> Member.toString
 
 type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedMap<'a, LinkedSet<'b>>) = 
     member this.LinkedMap() = x
+    
+    member this.ToList() = 
+        let linkedMap = this.LinkedMap()
+        let list, map = linkedMap.List(), linkedMap.Map()
+        let mutable lz : LazyList<'a * 'b> = LazyList.empty
+        list
+        |> LazyList.filter (fun x -> map.ContainsKey(x))
+        |> LazyList.toList
+        |> List.map (fun x -> (x, map.[x].ToList()))
+        |> List.iter (fun (k, v) -> v |> List.iter (fun y -> lz <- lz.Cons(k, y)))
+        lz
+    
+    //        |> List.map (fun (k, v) -> v |> List.map (fun x -> (k, x)))
+    //        |> List.reduce List.append
+    override this.ToString() = this.ToList() |> Member.toString
 
 module LinkedSet = 
     let add (value : 'a) (set : LinkedSet<'a>) = 

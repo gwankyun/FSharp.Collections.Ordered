@@ -25,7 +25,7 @@ module LinkedMap =
         let list, map = table.List(), table.Map()
         list
         |> LazyList.filter (fun x -> map |> Map.containsKey x)
-        |> LazyList.fold (fun s x -> folder state x map.[x]) state
+        |> LazyList.fold (fun s x -> folder s x map.[x]) state
     
     let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMap<'a, 'b>) (state : 's) = 
         let list, map = table.List(), table.Map()
@@ -73,7 +73,7 @@ module LinkedMap =
 //        LinkedMap(seq1, map1), LinkedMap(seq2, map2)
     
     let remove (key : 'a) (table : LinkedMap<'a, 'b>) = 
-        let seq, map = table.List() |> LazyList.filter ((=) key), table.Map() |> Map.remove key
+        let seq, map = table.List() |> LazyList.filter ((<>) key), table.Map() |> Map.remove key
         LinkedMap(seq, map)
     
     let toSeq (table : LinkedMap<'a, 'b>) = 

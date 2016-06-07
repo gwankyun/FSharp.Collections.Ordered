@@ -6,17 +6,35 @@ open FSharp.Collections
 
 module LinkedMultiMap = 
     let add (key : 'a) (value : 'b) (table : LinkedMultiMap<'a, 'b>) = 
-        let m = table.LinkedMap()
-        
-        let v = 
-            match LinkedMap.tryFind key m with
-            | Some(v) -> 
-                m
-                |> LinkedMap.remove key
-                |> LinkedMap.add key (LinkedSet.add value v)
-            | None -> LinkedMap.add key (LinkedSet.singleton value) m
-        LinkedMultiMap(v)
+        let linkedMap = table.LinkedMap()
+        let list, map = linkedMap.List(), linkedMap.Map()
+        match map |> Map.tryFind key with
+        | Some(set) -> 
+            match set |> LinkedSet.contains value with
+            | true -> table
+            | false -> 
+//                let list = list.Cons(key)
+                
+                let map = 
+                    map
+                    |> Map.remove key
+                    |> Map.add key (set |> LinkedSet.add value)
+                LinkedMultiMap(LinkedMap(list, map))
+        | None -> 
+            let list = list.Cons(key)
+            let map = map.Add(key, LinkedSet.singleton value)
+            LinkedMultiMap(LinkedMap(list, map))
     
+    //        let m = table.LinkedMap()
+    //        
+    //        let v = 
+    //            match LinkedMap.tryFind key m with
+    //            | Some(v) -> 
+    //                m
+    //                |> LinkedMap.remove key
+    //                |> LinkedMap.add key (LinkedSet.add value v)
+    //            | None -> LinkedMap.add key (LinkedSet.singleton value) m
+    //        LinkedMultiMap(v)
     let empty<'a, 'b when 'a : comparison and 'b : comparison> = 
         let m : LinkedMap<'a, LinkedSet<'b>> = LinkedMap(LazyList.empty, Map.empty)
         LinkedMultiMap<'a, 'b>(m)
@@ -73,8 +91,8 @@ module LinkedMultiMap =
     
     let ofList (elements : ('a * 'b) list) = 
         elements
-        |> List.toSeq
-        |> ofSeq
+//        |> List.rev
+        |> List.fold (fun s (k, v) -> s |> add k v) empty
     
     let remove (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
         match tryFind key table with
