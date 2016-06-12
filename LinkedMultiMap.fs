@@ -13,8 +13,6 @@ module LinkedMultiMap =
             match set |> LinkedSet.contains value with
             | true -> table
             | false -> 
-//                let list = list.Cons(key)
-                
                 let map = 
                     map
                     |> Map.remove key
@@ -25,16 +23,6 @@ module LinkedMultiMap =
             let map = map.Add(key, LinkedSet.singleton value)
             LinkedMultiMap(LinkedMap(list, map))
     
-    //        let m = table.LinkedMap()
-    //        
-    //        let v = 
-    //            match LinkedMap.tryFind key m with
-    //            | Some(v) -> 
-    //                m
-    //                |> LinkedMap.remove key
-    //                |> LinkedMap.add key (LinkedSet.add value v)
-    //            | None -> LinkedMap.add key (LinkedSet.singleton value) m
-    //        LinkedMultiMap(v)
     let empty<'a, 'b when 'a : comparison and 'b : comparison> = 
         let m : LinkedMap<'a, LinkedSet<'b>> = LinkedMap(LazyList.empty, Map.empty)
         LinkedMultiMap<'a, 'b>(m)
@@ -58,7 +46,7 @@ module LinkedMultiMap =
     
     let find (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
         let map = table.LinkedMap()
-        if containsKey key table then raise (KeyNotFoundException())
+        if containsKey key table |> not then raise (KeyNotFoundException())
         else LinkedMap.find key map
     
     let findkey (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
@@ -67,7 +55,7 @@ module LinkedMultiMap =
     
     let forall (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         let map = table.LinkedMap()
-        LinkedMap.forall (fun k v -> LinkedSet.forall (predicate k) v) map
+        map |> LinkedMap.forall (fun k v -> LinkedSet.forall (predicate k) v)
     
     let isEmpty (table : LinkedMultiMap<'a, 'b>) = 
         let map = table.LinkedMap()
@@ -83,16 +71,8 @@ module LinkedMultiMap =
         LinkedMap.tryFind key map
     
     let ofSeq (elements : ('a * 'b) seq) = Seq.fold (fun s (k, v) -> add k v s) empty elements
-    
-    let ofArray (elements : ('a * 'b) []) = 
-        elements
-        |> Array.toSeq
-        |> ofSeq
-    
-    let ofList (elements : ('a * 'b) list) = 
-        elements
-//        |> List.rev
-        |> List.fold (fun s (k, v) -> s |> add k v) empty
+    let ofArray (elements : ('a * 'b) []) = Array.fold (fun s (k, v) -> add k v s) empty elements
+    let ofList (elements : ('a * 'b) list) = elements |> List.fold (fun s (k, v) -> s |> add k v) empty
     
     let remove (key : 'a) (table : LinkedMultiMap<'a, 'b>) = 
         match tryFind key table with
@@ -100,15 +80,6 @@ module LinkedMultiMap =
             let map = table.LinkedMap()
             LinkedMultiMap(LinkedMap.remove key map)
         | None -> table
-    
-    let toSeq (table : LinkedMultiMap<'a, 'b>) = 
-        let m = table.LinkedMap()
-        let s = m.List()
-        let mutable seq : ('a * 'b) list = List.empty
-        iter (fun k v -> seq <- (k, v) :: seq) table
-        seq
-        |> Seq.ofList
-        |> Seq.rev
     
     let filter (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         let mutable r = empty
@@ -130,6 +101,21 @@ module LinkedMultiMap =
         let map2 = filter (fun k v -> not (predicate k v)) table
         map1, map2
     
+    let toList (table : LinkedMultiMap<'a, 'b>) = 
+        let mutable list : ('a * 'b) list = List.empty
+        table.LinkedMap() |> LinkedMap.iter (fun k v -> v |> LinkedSet.iter (fun i -> list <- (k, i) :: list))
+        list |> List.rev
+    
+    let toSeq (table : LinkedMultiMap<'a, 'b>) = 
+        table
+        |> toList
+        |> Seq.ofList
+    
+    let toArray (table : LinkedMultiMap<'a, 'b>) = 
+        table
+        |> toList
+        |> Array.ofList
+    
     let pick (chooser : 'a -> 'b -> 'c option) (table : LinkedMultiMap<'a, 'b>) = 
         let seq = toSeq table
         Seq.pick (fun (k, v) -> chooser k v) seq
@@ -141,16 +127,6 @@ module LinkedMultiMap =
     let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMultiMap<'a, 'b>) (state : 's) = 
         let seq = toSeq table
         Seq.foldBack (fun (k, v) s -> folder k v s) seq state
-    
-    let toArray (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Array.ofSeq
-    
-    let toList (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> List.ofSeq
     
     let tryFindKey (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         match exists predicate table with
