@@ -66,12 +66,11 @@ module LinkedMap =
         let map = Map.ofSeq elements
         LinkedMap(seq, map)
     
-//    let partition (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = 
-//        let seq, map = table.List(), table.Map()
-//        let seq1, seq2 = LazyList.partition (fun x -> predicate x map.[x]) seq
-//        let map1, map2 = Map.partition predicate map
-//        LinkedMap(seq1, map1), LinkedMap(seq2, map2)
-    
+    //    let partition (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = 
+    //        let seq, map = table.List(), table.Map()
+    //        let seq1, seq2 = LazyList.partition (fun x -> predicate x map.[x]) seq
+    //        let map1, map2 = Map.partition predicate map
+    //        LinkedMap(seq1, map1), LinkedMap(seq2, map2)
     let remove (key : 'a) (table : LinkedMap<'a, 'b>) = 
         let seq, map = table.List() |> LazyList.filter ((<>) key), table.Map() |> Map.remove key
         LinkedMap(seq, map)
@@ -103,14 +102,17 @@ module LinkedMap =
         |> LazyList.toSeq
         |> Seq.tryPick (fun x -> chooser x map.[x])
     
-    let difference (table1 : LinkedMap<'a, 'b>) (table2 : LinkedMap<'a, 'b>) = 
-        let s1 = table1.List()
-        let m1 = table1.Map()
-        let m2 = table2.Map()
-        let map = Map.difference m1 m2
-        let seq = LazyList.filter (fun x -> Map.containsKey x map) s1
-        LinkedMap(seq, map)
+    let difference (table1 : LinkedMap<'a, 'b>) (table2 : LinkedMap<'a, 'b>) =
+        let map1, map2 = table1.Map(), table2.Map()
+        let map = Map.difference map1 map2
+        table1 |> filter (fun k v -> map |> Map.containsKey k)
     
+    //        let s1 = table1.List()
+    //        let m1 = table1.Map()
+    //        let m2 = table2.Map()
+    //        let map = Map.difference m1 m2
+    //        let seq = LazyList.filter (fun x -> Map.containsKey x map) s1
+    //        LinkedMap(seq, map)
     //    let sortBy (projection : 'a -> 'b -> 'key) (table : LinkedMap<'a, 'b>) =
     //        table
     //        |> Seq.sortBy (fun (k, v) -> projection k v)
