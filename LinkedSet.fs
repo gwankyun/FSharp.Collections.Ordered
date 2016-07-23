@@ -206,3 +206,4 @@ module LinkedSet =
         set
         |> toSeq
         |> Seq.truncate count
+        |> ofSeq

@@ -172,6 +172,7 @@ module LinkedMultiMap =
         table
         |> toSeq
         |> Seq.sort
+        |> Seq.rev
         |> ofSeq
     
     let sortByDescending (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
