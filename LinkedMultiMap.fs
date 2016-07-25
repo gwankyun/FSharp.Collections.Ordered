@@ -144,12 +144,11 @@ module LinkedMultiMap =
             | None -> true) table1
     
     let groupBy (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> fold (fun s k v -> 
-               let key = projection k v
-               s |> add key (k, v)) empty
-////        |> (fun x -> x.LinkedMap())
+        table |> fold (fun s k v -> 
+                     let key = projection k v
+                     s |> add key (k, v)) empty
     
+    ////        |> (fun x -> x.LinkedMap())
     let sort (table : LinkedMultiMap<'a, 'b>) = 
         table
         |> toSeq
@@ -182,10 +181,7 @@ module LinkedMultiMap =
         |> ofSeq
     
     let length (table : LinkedMultiMap<'a, 'b>) = table.LinkedMap() |> LinkedMap.length
-
-    let toLinkedMap (table : LinkedMultiMap<'a, 'b>) =
-        table.LinkedMap()
-
-    let union (table1 : LinkedMultiMap<'a, 'b>) (table2 : LinkedMultiMap<'a, 'b>) =
-        table2
-        |> fold (fun s k v -> s |> add k v) table1
+    let toLinkedMap (table : LinkedMultiMap<'a, 'b>) = table.LinkedMap()
+    let union (table1 : LinkedMultiMap<'a, 'b>) (table2 : LinkedMultiMap<'a, 'b>) = 
+        table1 |> fold (fun s k v -> s |> add k v) table2
+    let unionMany (tables : LinkedMultiMap<'a, 'b> seq) = tables |> Seq.fold (fun a b -> a |> union b) empty
