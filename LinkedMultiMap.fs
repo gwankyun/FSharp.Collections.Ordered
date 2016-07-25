@@ -182,3 +182,6 @@ module LinkedMultiMap =
         |> ofSeq
     
     let length (table : LinkedMultiMap<'a, 'b>) = table.LinkedMap() |> LinkedMap.length
+
+    let toLinkedMap (table : LinkedMultiMap<'a, 'b>) =
+        table.LinkedMap()
