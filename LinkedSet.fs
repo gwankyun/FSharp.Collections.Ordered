@@ -155,10 +155,7 @@ module LinkedSet =
         let set = Set.ofList (list.List())
         LinkedSet(list, set)
     
-    let ofSeq (elements : 'a seq) = 
-        let list = LazyList.ofSeq elements
-        let set = Set.ofList (list.List())
-        LinkedSet(list, set)
+    let ofSeq (elements : 'a seq) = elements |> Seq.fold (fun a b -> a |> add b) empty
     
     let partition (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
         let sq1, sq2 = 
@@ -201,8 +198,8 @@ module LinkedSet =
         table |> fold (fun (s : LinkedMap<'key, 'a>) t -> 
                      let key = projection t
                      s.Add(key, t)) (LinkedMap<'key, 'a>.Empty())
-
-    let truncate (count : int) (set : LinkedSet<'a>) =
+    
+    let truncate (count : int) (set : LinkedSet<'a>) = 
         set
         |> toSeq
         |> Seq.truncate count

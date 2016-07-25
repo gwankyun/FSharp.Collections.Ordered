@@ -57,14 +57,7 @@ module LinkedMap =
         let map = seq.List() |> Map.ofSeq
         LinkedMap(LazyList.map Tuple.first seq, map)
     
-    let ofSeq (elements : ('a * 'b) seq) = 
-        let seq = 
-            elements
-            |> Seq.map Tuple.first
-            |> LazyList.ofSeq
-        
-        let map = Map.ofSeq elements
-        LinkedMap(seq, map)
+    let ofSeq (elements : ('a * 'b) seq) = elements |> Seq.fold (fun k (a, b) -> k |> add a b) empty
     
     //    let partition (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = 
     //        let seq, map = table.List(), table.Map()
@@ -102,7 +95,7 @@ module LinkedMap =
         |> LazyList.toSeq
         |> Seq.tryPick (fun x -> chooser x map.[x])
     
-    let difference (table1 : LinkedMap<'a, 'b>) (table2 : LinkedMap<'a, 'b>) =
+    let difference (table1 : LinkedMap<'a, 'b>) (table2 : LinkedMap<'a, 'b>) = 
         let map1, map2 = table1.Map(), table2.Map()
         let map = Map.difference map1 map2
         table1 |> filter (fun k v -> map |> Map.containsKey k)

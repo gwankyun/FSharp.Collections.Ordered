@@ -185,3 +185,7 @@ module LinkedMultiMap =
 
     let toLinkedMap (table : LinkedMultiMap<'a, 'b>) =
         table.LinkedMap()
+
+    let union (table1 : LinkedMultiMap<'a, 'b>) (table2 : LinkedMultiMap<'a, 'b>) =
+        table2
+        |> fold (fun s k v -> s |> add k v) table1
