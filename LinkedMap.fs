@@ -146,3 +146,8 @@ module LinkedMap =
         |> ofSeq
     
     let length (table : LinkedMap<'a, 'b>) = table.List() |> LazyList.length
+    
+    let keys (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.map (fun (a, _) -> a)
