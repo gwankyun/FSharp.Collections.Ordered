@@ -151,3 +151,8 @@ module LinkedMap =
         table
         |> toSeq
         |> Seq.map (fun (a, _) -> a)
+    
+    let values (table : LinkedMap<'a, 'b>) = 
+        table
+        |> toSeq
+        |> Seq.map (fun (_, b) -> b)
