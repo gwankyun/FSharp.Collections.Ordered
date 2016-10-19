@@ -185,3 +185,6 @@ module LinkedMultiMap =
     let union (table1 : LinkedMultiMap<'a, 'b>) (table2 : LinkedMultiMap<'a, 'b>) = 
         table1 |> fold (fun s k v -> s |> add k v) table2
     let unionMany (tables : LinkedMultiMap<'a, 'b> seq) = tables |> Seq.fold (fun a b -> a |> union b) empty
+    //    let keys (table : LinkedMultiMap<'a, 'b>) =
+    //        table
+    let ofLinkedSet (set : LinkedSet<'a * 'b>) = set |> LinkedSet.fold (fun s (k, v) -> s |> add k v) empty
