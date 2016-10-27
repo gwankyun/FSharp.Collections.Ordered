@@ -3,6 +3,7 @@
 open System.Collections.Generic
 open Extension
 open FSharp.Collections
+open FSharpx.Collections
 
 module LinkedMultiMap = 
     let add (key : 'a) (value : 'b) (table : LinkedMultiMap<'a, 'b>) = 
@@ -19,7 +20,7 @@ module LinkedMultiMap =
                     |> Map.add key (set |> LinkedSet.add value)
                 LinkedMultiMap(LinkedMap(list, map))
         | None -> 
-            let list = list.Cons(key)
+            let list = LazyList.cons key list
             let map = map.Add(key, LinkedSet.singleton value)
             LinkedMultiMap(LinkedMap(list, map))
     
@@ -124,9 +125,9 @@ module LinkedMultiMap =
         let seq = toSeq table
         Seq.fold (fun s (xk, xv) -> folder s xk xv) state seq
     
-    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMultiMap<'a, 'b>) (state : 's) = 
-        let seq = toSeq table
-        Seq.foldBack (fun (k, v) s -> folder k v s) seq state
+//    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMultiMap<'a, 'b>) (state : 's) = 
+//        let seq = toSeq table
+//        Seq.foldBack (fun (k, v) s -> folder k v s) seq state
     
     let tryFindKey (predicate : 'a -> 'b -> bool) (table : LinkedMultiMap<'a, 'b>) = 
         match exists predicate table with
@@ -161,18 +162,18 @@ module LinkedMultiMap =
         |> Seq.sortBy (fun (k, v) -> projection k v)
         |> ofSeq
     
-    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
-        |> ofSeq
+//    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMultiMap<'a, 'b>) = 
+//        table
+//        |> toSeq
+//        |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
+//        |> ofSeq
     
-    let sortDescending (table : LinkedMultiMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Seq.sort
-        |> Seq.rev
-        |> ofSeq
+//    let sortDescending (table : LinkedMultiMap<'a, 'b>) = 
+//        table
+//        |> toSeq
+//        |> Seq.sort
+//        |> Seq.rev
+//        |> ofSeq
     
     let sortByDescending (projection : 'a -> 'b -> 'key) (table : LinkedMultiMap<'a, 'b>) = 
         table

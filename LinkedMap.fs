@@ -3,11 +3,12 @@
 open System.Collections.Generic
 open Extension
 open FSharp.Collections
+open FSharpx.Collections
 
 module LinkedMap = 
     let add (key : 'a) (value : 'b) (set : LinkedMap<'a, 'b>) = 
         let a, b = set.List(), set.Map()
-        let seq = a.Cons(key)
+        let seq = LazyList.cons key a
         LinkedMap(seq, b.Add(key, value))
     
     let containsKey (key : 'a) (table : LinkedMap<'a, 'b>) = table.Map() |> Map.containsKey key
@@ -27,11 +28,11 @@ module LinkedMap =
         |> LazyList.filter (fun x -> map |> Map.containsKey x)
         |> LazyList.fold (fun s x -> folder s x map.[x]) state
     
-    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMap<'a, 'b>) (state : 's) = 
-        let list, map = table.List(), table.Map()
-        list
-        |> LazyList.filter (fun x -> map |> Map.containsKey x)
-        |> (fun i -> LazyList.foldBack (fun x s -> folder x map.[x] state) i state)
+//    let foldBack (folder : 'a -> 'b -> 's -> 's) (table : LinkedMap<'a, 'b>) (state : 's) = 
+//        let list, map = table.List(), table.Map()
+//        list
+//        |> LazyList.filter (fun x -> map |> Map.containsKey x)
+//        |> (fun i -> LazyList.f (fun x s -> folder x map.[x] state) i state)
     
     let forall (predicate : 'a -> 'b -> bool) (table : LinkedMap<'a, 'b>) = table.Map() |> Map.forall predicate
     let isEmpty (table : LinkedMap<'a, 'b>) = table.Map() |> Map.isEmpty
@@ -49,12 +50,12 @@ module LinkedMap =
     
     let ofArray (elements : ('a * 'b) []) = 
         let seq = LazyList.ofArray elements
-        let map = seq.List() |> Map.ofSeq
+        let map = seq |> LazyList.toSeq |> Map.ofSeq
         LinkedMap(LazyList.map Tuple.first seq, map)
     
     let ofList (elements : ('a * 'b) list) = 
         let seq = LazyList.ofList elements
-        let map = seq.List() |> Map.ofSeq
+        let map = seq |> LazyList.toSeq |> Map.ofSeq
         LinkedMap(LazyList.map Tuple.first seq, map)
     
     let ofSeq (elements : ('a * 'b) seq) = elements |> Seq.fold (fun k (a, b) -> k |> add a b) empty
@@ -127,11 +128,11 @@ module LinkedMap =
         |> Seq.sortBy (fun (k, v) -> projection k v)
         |> ofSeq
     
-    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMap<'a, 'b>) = 
-        table
-        |> toSeq
-        |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
-        |> ofSeq
+//    let sortWith (comparer : 'a * 'b -> ('a * 'b -> int)) (table : LinkedMap<'a, 'b>) = 
+//        table
+//        |> toSeq
+//        |> Seq.sortWith (fun k1 k2 -> comparer k1 k2)
+//        |> ofSeq
     
     let sortDescending (table : LinkedMap<'a, 'b>) = 
         table

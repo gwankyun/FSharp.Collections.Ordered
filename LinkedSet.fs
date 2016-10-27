@@ -5,16 +5,14 @@ open System.Collections
 open System
 open Extension
 open FSharp.Collections
+open FSharpx.Collections
 
 type LinkedSet<'a when 'a : comparison>(x : LazyList<'a>, y : Set<'a>) = 
     member this.Set() = y
     member this.List() = x
     override this.ToString() = this.ToList() |> Member.toString
     member this.ToList() = 
-        let list, set = this.List(), this.Set()
-        list
-        |> LazyList.filter (fun x -> set.Contains(x))
-        |> LazyList.toList
+        x |> LazyList.toList
 
 type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) = 
     member this.List() = x
@@ -24,7 +22,7 @@ type LinkedMap<'a, 'b when 'a : comparison>(x : LazyList<'a>, y : Map<'a, 'b>) =
     
     member this.Add(key : 'a, value : 'b) = 
         let list, map = this.List(), this.Map()
-        let seq = list.Cons(key)
+        let seq = LazyList.cons key list
         LinkedMap(seq, map.Add(key, value))
     
     member this.ToList() = 
@@ -47,7 +45,7 @@ type LinkedMultiMap<'a, 'b when 'a : comparison and 'b : comparison>(x : LinkedM
         |> LazyList.filter (fun x -> map.ContainsKey(x))
         |> LazyList.toList
         |> List.map (fun x -> (x, map.[x].ToList()))
-        |> List.iter (fun (k, v) -> v |> List.iter (fun y -> lz <- lz.Cons(k, y)))
+        |> List.iter (fun (k, v) -> v |> List.iter (fun y -> lz <- lz |> LazyList.cons (k, y)))
         lz
     
     //        |> List.map (fun (k, v) -> v |> List.map (fun x -> (k, x)))
@@ -60,7 +58,7 @@ module LinkedSet =
         match Set.contains value b with
         | true -> LinkedSet(a, b)
         | false -> 
-            let list = a.Cons(value)
+            let list = LazyList.cons value a
             LinkedSet(list, b.Add(value))
     
     let contains (value : 'a) (set : LinkedSet<'a>) = Set.contains value (set.Set())
@@ -95,9 +93,9 @@ module LinkedSet =
         |> LazyList.filter (fun x -> set.Set().Contains(x))
         |> LazyList.fold folder state
     
-    let foldBack (folder : 't -> 's -> 's) (set : LinkedSet<'t>) (state : 's) = 
-        let list = set.List() |> LazyList.filter (fun x -> set.Set().Contains(x))
-        LazyList.foldBack folder list state
+//    let foldBack (folder : 't -> 's -> 's) (set : LinkedSet<'t>) (state : 's) = 
+//        let list : FSharpx.Collections.LazyList<'t> = set.List() |> LazyList.filter (fun x -> set.Set().Contains(x))
+//        LazyList.f folder list state
     
     let forall (predicate : 'a -> bool) (set : LinkedSet<'a>) = 
         let set = set.Set()
@@ -147,12 +145,12 @@ module LinkedSet =
     
     let ofArray (array : 'a []) = 
         let list = LazyList.ofArray array
-        let set = Set.ofList (list.List())
+        let set = list |> LazyList.toList |> Set.ofList
         LinkedSet(list, set)
     
     let ofList (elements : 'a list) = 
         let list = LazyList.ofList elements
-        let set = Set.ofList (list.List())
+        let set = list |> LazyList.toList |> Set.ofList
         LinkedSet(list, set)
     
     let ofSeq (elements : 'a seq) = elements |> Seq.fold (fun a b -> a |> add b) empty
