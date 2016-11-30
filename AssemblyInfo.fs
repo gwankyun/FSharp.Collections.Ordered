@@ -1,6 +1,5 @@
 ﻿namespace FSharp.Collections.Linked.AssemblyInfo
 
-open System.Resources
 open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
@@ -16,7 +15,14 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyCopyright("Copyright ©  2016")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
-[<assembly: NeutralResourcesLanguage("en")>]
+
+//将 ComVisible 设置为 false 将使此程序集中的类型
+//对 COM 组件不可见。  如果需要从 COM 访问此程序集中的类型，
+//请将此类型的 ComVisible 特性设置为 true。
+[<assembly: ComVisible(false)>]
+
+// 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
+[<assembly: Guid("41346de6-417c-43fa-9342-763c813127bd")>]
 
 // 程序集的版本信息由下列四个值组成: 
 // 
