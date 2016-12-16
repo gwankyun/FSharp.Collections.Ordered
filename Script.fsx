@@ -1,8 +1,8 @@
-﻿// 在 http://fsharp.org 上了解有关 F# 的详细信息。请参见“F# 教程”项目
-// 获取有关 F# 编程的更多指导。
+﻿// Learn more about F# at http://fsharp.org. See the 'F# Tutorial' project
+// for more guidance on F# programming.
 
 #load "Library1.fs"
 open FSharp.Collections.Linked
 
-// 在此处定义库脚本代码
+// Define your library scripting code here
 

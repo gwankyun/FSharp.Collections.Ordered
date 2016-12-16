@@ -3,7 +3,7 @@
 open System.Collections.Generic
 open System.Collections
 open System
-open Extension
+open FSharp.Extension
 open FSharp.Collections
 open FSharpx.Collections
 

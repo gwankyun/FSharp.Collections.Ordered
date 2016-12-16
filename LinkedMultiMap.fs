@@ -1,7 +1,7 @@
 ﻿namespace FSharp.Collections
 
 open System.Collections.Generic
-open Extension
+open FSharp.Extension
 open FSharp.Collections
 open FSharpx.Collections
 
