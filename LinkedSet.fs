@@ -1,4 +1,4 @@
-﻿namespace FSharp.Collections
+﻿namespace FSharp.Collections.Linked
 
 open System.Collections.Generic
 open System.Collections
