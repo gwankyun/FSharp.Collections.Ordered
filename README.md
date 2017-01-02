@@ -1,4 +1,4 @@
-# FSharp.Original.Collections
+# FSharp.Collections.Ordered
 F#的可以記住插入順序的集合
 
 依賴FSharp.Extension、FSharpx.Collections庫
