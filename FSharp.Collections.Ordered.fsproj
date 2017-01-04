@@ -46,9 +46,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Library1.fs" />
     <None Include="Script.fsx" />
-    <Compile Include="LinkedSet.fs" />
-    <Compile Include="LinkedMap.fs" />
-    <Compile Include="LinkedMultiMap.fs" />
+    <Compile Include="OrderedSet.fs" />
+    <Compile Include="OrderedMap.fs" />
+    <Compile Include="OrderedMultiMap.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Extension\FSharp.Extension.fsproj">
