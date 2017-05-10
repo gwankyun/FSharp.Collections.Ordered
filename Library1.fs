@@ -1,4 +1,4 @@
-﻿namespace FSharp.Collections.Linked
+﻿namespace OrderedCollection
 
 type Class1() = 
     member this.X = "F#"
