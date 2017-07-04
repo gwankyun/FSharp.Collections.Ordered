@@ -1,7 +1,7 @@
 ﻿namespace OrderedCollection
 open FSharpx.Collections
-//open FSharpx.Functional
-//open FSharpx.Functional.Prelude
+open FSharpx.Functional
+open FSharpx.Functional.Prelude
 
 type OrderedMultiMap<'k, 'v  when 'k : comparison and 'v : comparison>(map : OrderedMap<'k, OrderedSet<'v>>) =
     member this.First = map.First
@@ -9,7 +9,7 @@ type OrderedMultiMap<'k, 'v  when 'k : comparison and 'v : comparison>(map : Ord
     member this.Map = map
 
 module OrderedMultiMap =
-    let flip f a b = f b a
+    //let flip f a b = f b a
 
     let isEmpty (set : OrderedMultiMap<'k, 'v>) =
         set.Map |> OrderedMap.isEmpty

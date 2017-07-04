@@ -1,7 +1,7 @@
 ﻿namespace OrderedCollection
 open FSharpx.Collections
-//open FSharpx.Functional
-//open FSharpx.Functional.Prelude
+open FSharpx.Functional
+open FSharpx.Functional.Prelude
 
 //[<CustomEquality; NoComparison>]
 type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
@@ -23,7 +23,7 @@ type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k op
             
 
 module OrderedSet =
-    let flip f a b = f b a
+    //let flip f a b = f b a
 
     let isEmpty (set : OrderedSet<'k>) =
         set.Map |> Map.isEmpty

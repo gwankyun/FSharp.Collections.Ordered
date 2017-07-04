@@ -2,7 +2,7 @@
 // 获取有关 F# 编程的更多指导。
 
 #load "Library1.fs"
-open OrderedCollection
+open FSharp.Collections.Ordered
 
 // 在此处定义库脚本代码
 

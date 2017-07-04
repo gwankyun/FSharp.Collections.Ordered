@@ -1,8 +1,7 @@
 ﻿namespace OrderedCollection
 open FSharpx.Collections
-//open FSharpx.
-//open FSharpx.Functional
-//open FSharpx.Functional.Prelude
+open FSharpx.Functional
+open FSharpx.Functional.Prelude
 
 type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : comparison>(first : 'k option, table : Map<'k, ('k * 'v * 'k)>, last : 'k option) =
     member this.First = first
@@ -19,7 +18,7 @@ type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : 
         member this.CompareTo(o : obj) = 0
 
 module OrderedMap =
-    let flip f a b = f b a
+    //let flip f a b = f b a
 
     let isEmpty (set : OrderedMap<'k, 'v>) =
         set.Map |> Map.isEmpty
