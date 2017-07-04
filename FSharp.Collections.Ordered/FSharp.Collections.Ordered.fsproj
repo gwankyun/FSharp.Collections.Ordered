@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Control.AsyncSeq">
-      <HintPath>..\packages\FSharp.Control.AsyncSeq.1.13\lib\net40\FSharp.Control.AsyncSeq.dll</HintPath>
+      <HintPath>..\packages\FSharp.Control.AsyncSeq.2.0.12\lib\net45\FSharp.Control.AsyncSeq.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.2.1\lib\net45\FSharp.Core.dll</HintPath>
@@ -78,7 +78,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Console">
-      <HintPath>..\packages\System.Console.4.0.0\lib\net46\System.Console.dll</HintPath>
+      <HintPath>..\packages\System.Console.4.3.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.IO">
@@ -104,10 +104,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Threading.Thread">
-      <HintPath>..\packages\System.Threading.Thread.4.0.0\lib\net46\System.Threading.Thread.dll</HintPath>
+      <HintPath>..\packages\System.Threading.Thread.4.3.0\lib\net46\System.Threading.Thread.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.ThreadPool">
-      <HintPath>..\packages\System.Threading.ThreadPool.4.0.10\lib\net46\System.Threading.ThreadPool.dll</HintPath>
+      <HintPath>..\packages\System.Threading.ThreadPool.4.3.0\lib\net46\System.Threading.ThreadPool.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple">
       <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
