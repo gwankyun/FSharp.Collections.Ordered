@@ -27,17 +27,23 @@ type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k op
     
 module OrderedSet =
     begin
+
         let isEmpty (set : OrderedSet<'k>) =
             set.Map |> Map.isEmpty
 
-        let add (value : 'k) (set : OrderedSet<'k>) =
+        let (|IsEmpty|_|) (set : OrderedSet<'k>) =
             match set |> isEmpty with
-            | true ->
+            | true -> Some()
+            | false -> None
+
+        let add (value : 'k) (set : OrderedSet<'k>) =
+            match set with
+            | IsEmpty ->
                 let first = Some value in
                 let last = Some value in
                 let map = Map.empty |> Map.add value (value, value) in
                 OrderedSet(first, map, last)
-            | false ->
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let map = set.Map in
@@ -63,9 +69,9 @@ module OrderedSet =
             OrderedSet(None, Map.empty, None)
             
         let fold (folder : 's -> 't -> 's) (state : 's) (set : OrderedSet<'t>) =
-            match set |> isEmpty with
-            | true -> state
-            | false ->
+            match set with
+            | IsEmpty -> state
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let rec inner s t =
@@ -80,9 +86,9 @@ module OrderedSet =
                 inner state first
 
         let remove (value : 'k) (set : OrderedSet<'k>) =
-            match set |> isEmpty with
-            | true -> set
-            | false ->
+            match set with
+            | IsEmpty -> set
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let map = set.Map in
@@ -188,9 +194,9 @@ module OrderedSet =
             empty |> add value
 
         let foldBack (folder : 't -> 's -> 's) (set : OrderedSet<'t>) (state : 's) =
-            match set |> isEmpty with
-            | true -> state
-            | false ->
+            match set with
+            | IsEmpty -> state
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let rec inner s t =

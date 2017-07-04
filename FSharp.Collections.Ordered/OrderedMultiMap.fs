@@ -17,16 +17,21 @@ module OrderedMultiMap =
         let isEmpty (set : OrderedMultiMap<'k, 'v>) =
             set.Map |> OrderedMap.isEmpty
 
+        let (|IsEmpty|_|) (set : OrderedMultiMap<'k, 'v>) =
+            match set |> isEmpty with
+            | true -> Some()
+            | false -> None
+
         let ofOrderedMap(map : OrderedMap<'k, OrderedSet<'v>>) =
             OrderedMultiMap(map)
 
         let add (key : 'k) (value : 'v) (set : OrderedMultiMap<'k, 'v>) =
-            match set |> isEmpty with
-            | true ->
+            match set with
+            | IsEmpty ->
                 let v = OrderedSet.empty |> OrderedSet.add value in
                 let map = OrderedMap.empty |> OrderedMap.add key v in
                 OrderedMultiMap(map)
-            | false ->
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let map = set.Map in
@@ -49,7 +54,7 @@ module OrderedMultiMap =
             |> OrderedMap.fold (fun s _ v -> s + v) 0
 
         let empty<'k, 'v  when 'k : comparison and 'v : comparison> : OrderedMultiMap<'k, 'v> =
-            OrderedMultiMap(OrderedMap(None, Map.empty, None))
+            OrderedMap(None, Map.empty, None) |> ofOrderedMap
 
         let fold (folder : 's -> 'k -> 'v -> 's) (state : 's) (set : OrderedMultiMap<'k, 'v>) =
             set.Map

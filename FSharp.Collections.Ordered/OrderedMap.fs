@@ -28,14 +28,19 @@ module OrderedMap =
         let isEmpty (set : OrderedMap<'k, 'v>) =
             set.Map |> Map.isEmpty
 
-        let add (key : 'k) (value : 'v) (set : OrderedMap<'k, 'v>) =
+        let (|IsEmpty|_|) (set : OrderedMap<'k, 'v>) =
             match set |> isEmpty with
-            | true ->
+            | true -> Some()
+            | false -> None
+
+        let add (key : 'k) (value : 'v) (set : OrderedMap<'k, 'v>) =
+            match set with
+            | IsEmpty ->
                 let first = Some key in
                 let last = Some key in
                 let map = Map.empty |> Map.add key (key, value, key) in
                 OrderedMap(first, map, last)
-            | false ->
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let map = set.Map in
@@ -65,9 +70,9 @@ module OrderedMap =
             OrderedMap(None, Map.empty, None)
 
         let fold (folder : 's -> 'k -> 'v -> 's) (state : 's) (set : OrderedMap<'k, 'v>) =
-            match set |> isEmpty with
-            | true -> state
-            | false ->
+            match set with
+            | IsEmpty -> state
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let rec inner s k =
@@ -81,9 +86,9 @@ module OrderedMap =
                 inner state first
         
         let remove (key : 'k) (set : OrderedMap<'k, 'v>) =
-            match set |> isEmpty with
-            | true -> empty
-            | false ->
+            match set with
+            | IsEmpty -> empty
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let map = set.Map in
@@ -181,9 +186,9 @@ module OrderedMap =
             ) (empty, empty) set
             
         let foldBack (folder : 'k -> 'v -> 's -> 's) (set : OrderedMap<'k, 'v>) (state : 's) =
-            match set |> isEmpty with
-            | true -> state
-            | false ->
+            match set with
+            | IsEmpty -> state
+            | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
                 let rec inner s k =
