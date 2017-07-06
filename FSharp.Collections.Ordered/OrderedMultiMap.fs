@@ -12,10 +12,6 @@ type OrderedMultiMap<'k, 'v  when 'k : comparison and 'v : comparison>(map : Ord
 
 module OrderedMultiMap =
     begin
-        //let flip f a b = f b a
-        //let empty<'k,'v when 'k : comparison and 'v : comparison> : OrderedMultiMap<'k, 'v> =
-        //    OrderedMultiMap(OrderedMap.empty)
-
         let isEmpty (set : OrderedMultiMap<'k, 'v>) =
             set.Map |> OrderedMap.isEmpty
 
@@ -28,7 +24,7 @@ module OrderedMultiMap =
             OrderedMultiMap(map)
 
         let empty<'k, 'v  when 'k : comparison and 'v : comparison> : OrderedMultiMap<'k, 'v> =
-            OrderedMap(None, Map.empty, None) |> ofOrderedMap
+            OrderedMap.empty |> ofOrderedMap
 
         let add (key : 'k) (value : 'v) (set : OrderedMultiMap<'k, 'v>) =
             match set with
@@ -39,12 +35,14 @@ module OrderedMultiMap =
                 let map = set.Map in
                 match map |> OrderedMap.tryFind key with
                 | Some (v) ->
+                    let value = v |> OrderedSet.add value in 
                     map
-                    |> OrderedMap.updateWith (fun v -> Some (v |> OrderedSet.add value)) key
+                    |> OrderedMap.updateWith (fun _ -> Some (value)) key
                     |> ofOrderedMap
                 | None ->
+                    let value = OrderedSet.singleton value in
                     map
-                    |> OrderedMap.add key (OrderedSet.singleton value)
+                    |> OrderedMap.add key value
                     |> ofOrderedMap
 
         let containsKey (key : 'k) (set : OrderedMultiMap<'k, 'v>) =
@@ -93,8 +91,11 @@ module OrderedMultiMap =
                 
         let iter (action : 'k -> 'v -> unit) (set : OrderedMultiMap<'k, 'v>) =
             fold (fun s k v ->
-                action k v
-                s) empty set
+                begin
+                    action k v;
+                    s;
+                end
+                ) empty set
 
         let forall (predicate : 'k -> 'v -> bool) (set : OrderedMultiMap<'k, 'v>) =
             let map = set.Map in
@@ -124,8 +125,9 @@ module OrderedMultiMap =
             ) (empty, empty) set
             
         let foldBack (folder : 'k -> 'v -> 's -> 's) (set : OrderedMultiMap<'k, 'v>) (state : 's) =
-            OrderedMap.foldBack (fun k v s ->
-                OrderedSet.foldBack (fun t ss -> folder k t ss) v s) set.Map state
+            flip3 OrderedMap.foldBack set.Map state
+            <| (fun k v s ->
+                    OrderedSet.foldBack (fun t ss -> folder k t ss) v s)
 
         let toList (set : OrderedMultiMap<'k, 'v>) =
             foldBack (fun k v s -> (k, v) :: s) set []
