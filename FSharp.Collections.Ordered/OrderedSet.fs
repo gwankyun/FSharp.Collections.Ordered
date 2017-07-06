@@ -3,6 +3,14 @@ open FSharpx.Collections
 open FSharpx.Functional
 open FSharpx.Functional.Prelude
 
+module Seq =
+    begin
+        let (|IsEmpty|_|) (set : 'a seq) =
+            match set |> Seq.isEmpty with
+            | true -> Some()
+            | false -> None
+    end
+
 //[<CustomEquality; NoComparison>]
 type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
 //type OrderedSet<'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
@@ -27,7 +35,6 @@ type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k op
     
 module OrderedSet =
     begin
-
         let isEmpty (set : OrderedSet<'k>) =
             set.Map |> Map.isEmpty
 
@@ -136,9 +143,13 @@ module OrderedSet =
                 empty set
                 
         let iter (action : 'k -> unit) (set : OrderedSet<'k>) =
-            fold (fun a b ->
-                action b 
-                a) empty set
+            set
+            |> fold (fun a b ->
+                begin
+                    action b;
+                    a;
+                end
+                ) empty
 
         let forall (predicate : 'k -> bool) (set : OrderedSet<'k>) =
             set.Map |> Map.forall (fun k _ -> predicate k)

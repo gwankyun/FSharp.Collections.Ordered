@@ -95,23 +95,23 @@ module OrderedMap =
                 match map |> Map.tryFind key with
                 | Some (prev, _, next) ->
                     match (key = first, key = last) with
-                    | (true, true) -> empty
-                    | (true, false) ->
-                        let first = next in
+                    | (true, true) -> empty // 只有一個鍵
+                    | (true, false) -> // 第一個
+                        //let first = next in
                         let map =
                             map
                             |> Map.remove key
-                            |> Map.updateWith (fun (_, v, n) -> Some (first, v, n)) next
+                            |> Map.updateWith (fun (_, v, n) -> Some (next, v, n)) next
                         in
-                        OrderedMap(Some first, map, Some last)
+                        OrderedMap(Some next, map, Some last)
                     | (false, true) ->
-                        let last = prev in
+                        //let last = prev in
                         let map =
                             map
                             |> Map.remove key
-                            |> Map.updateWith (fun (p, v, _) -> Some (p, v, last)) prev
+                            |> Map.updateWith (fun (p, v, _) -> Some (p, v, prev)) prev
                         in
-                        OrderedMap(Some first, map, Some last)
+                        OrderedMap(Some first, map, Some prev)
                     | (false, false) ->
                         let map =
                             map
@@ -125,8 +125,11 @@ module OrderedMap =
         let exists (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
             let map = set.Map in
             map |> Map.exists (fun k v ->
-                                    let (_, v, _) = map.[k]
-                                    predicate k v)
+                                begin
+                                    let (_, v, _) = map.[k];
+                                    predicate k v;
+                                end
+                                    )
             
         let filter (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
             fold (fun s k v ->
@@ -160,12 +163,9 @@ module OrderedMap =
         let forall (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
             let map = set.Map in
             map |> Map.forall (fun k v ->
-                                begin
-                                   let (_, v, _) = map.[k]
+                                   let (_, v, _) = map.[k] in
                                    predicate k v
-                                end
                                    )
-
         let map (mapping : 'k -> 'v -> 'u) (set : OrderedMap<'k, 'v>) =
             fold (fun s k v -> s |> add k (mapping k v)) empty set
             
