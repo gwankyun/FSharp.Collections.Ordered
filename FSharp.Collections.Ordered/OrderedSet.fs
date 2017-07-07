@@ -186,13 +186,13 @@ module OrderedSet =
             set.Map |> Map.keys |> Seq.min
             
         let ofArray (array : 'k []) =
-            Array.fold (fun s i -> s |> add i) empty array
+            Array.fold (flip add) empty array
             
         let ofList (elements : 'k list) =
-            List.fold (fun s i -> s |> add i) empty elements
+            List.fold (flip add) empty elements
 
         let ofSeq (elements : 'k seq) =
-            Seq.fold (fun s i -> s |> add i) empty elements
+            Seq.fold (flip add) empty elements
 
         let partition (predicate : 'k -> bool) (set : OrderedSet<'k>) =
             fold (fun (set1, set2) t ->

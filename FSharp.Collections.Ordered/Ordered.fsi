@@ -155,6 +155,9 @@ namespace OrderedCollection
     val map :
       mapping:('k -> 'v -> 'u) -> set:OrderedMap<'k,'v> -> OrderedMap<'k,'u>
         when 'k : comparison and 'v : comparison and 'u : comparison
+    val addTuple :
+      s:OrderedMap<'a,'b> -> k:'a * v:'b -> OrderedMap<'a,'b>
+        when 'a : comparison and 'b : comparison
     val ofArray :
       array:('k * 'v) [] -> OrderedMap<'k,'v>
         when 'k : comparison and 'v : comparison

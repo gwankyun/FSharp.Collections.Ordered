@@ -168,15 +168,18 @@ module OrderedMap =
                                    )
         let map (mapping : 'k -> 'v -> 'u) (set : OrderedMap<'k, 'v>) =
             fold (fun s k v -> s |> add k (mapping k v)) empty set
+
+        let addTuple s (k, v) =
+            s |> add k v
             
         let ofArray (array : ('k * 'v) []) =
-            Array.fold (fun s (k, v) -> s |> add k v) empty array
+            Array.fold addTuple empty array
             
         let ofList (elements : ('k * 'v) list) =
-            List.fold (fun s (k, v) -> s |> add k v) empty elements
+            List.fold addTuple empty elements
 
         let ofSeq (elements : ('k * 'v) seq) =
-            Seq.fold (fun s (k, v) -> s |> add k v) empty elements
+            Seq.fold addTuple empty elements
 
         let partition (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
             fold (fun (set1, set2) k v ->
