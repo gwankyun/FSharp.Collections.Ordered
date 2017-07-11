@@ -10,6 +10,16 @@ namespace FSharp.Collections.Ordered
     end
 
 namespace OrderedCollection
+  type SkipMap<'a,'b> =
+    class
+      new : list:('a * 'b) list list * compare:('a -> 'a -> bool) ->
+              SkipMap<'a,'b>
+      member Compare : ('a -> 'a -> bool)
+      member Data : ('a * 'b) list list
+    end
+  module SkipMap = begin
+    val emptyWith : compare:('a -> 'a -> bool) -> SkipMap<'a,'b>
+  end
   module Seq = begin
     val ( |IsEmpty|_| ) : set:seq<'a> -> unit option
   end
@@ -21,6 +31,7 @@ namespace OrderedCollection
               OrderedSet<'k>
       override Equals : y:obj -> bool
       override GetHashCode : unit -> int
+      override ToString : unit -> string
       member First : 'k option
       member Last : 'k option
       member Map : Map<'k,('k * 'k)>
@@ -193,6 +204,7 @@ namespace OrderedCollection
   type OrderedMultiMap<'k,'v when 'k : comparison and 'v : comparison> =
     class
       new : map:OrderedMap<'k,OrderedSet<'v>> -> OrderedMultiMap<'k,'v>
+      override ToString : unit -> string
       member First : 'k option
       member Last : 'k option
       member Map : OrderedMap<'k,OrderedSet<'v>>

@@ -262,8 +262,9 @@ type OrderedMapProperties =
 
 type OrderedMultiMapProperties =
     class 
-        //static member add (xs : (int * int) list) (k : int) (v : int) =
-            
+        static member add (xs : (int * int) list) (k : int) (v : int) =
+            (xs |> OrderedMultiMap.ofList |> OrderedMultiMap.add k v |> OrderedMultiMap.toList) =
+                (xs |> List.append [(k, v)] |> OrderedMultiMap.ofList |> OrderedMultiMap.toList)
         //static member ofList (xs : Map<int, int>) =
         //    let keys = xs |> Map.keys |> List.ofSeq in
         //    (keys |> List.map (fun x -> x, xs.[x]) |> OrderedMap.ofList |> OrderedMap.toList) = (keys |> List.map (fun x -> x, xs.[x]))
@@ -312,5 +313,10 @@ let main argv =
                   |> OrderedMultiMap.add 1 1
                   |> OrderedMultiMap.add 2 1
                   |> OrderedMultiMap.add 3 1
-                  |> OrderedMultiMap.toList)
+                  |> OrderedMultiMap.add 1 2
+                  |> OrderedMultiMap.toList
+                  )
+    printfn "%A" ([(1, 1);(2,2);(3,3);(1, 2)]
+                  |> OrderedMultiMap.ofList
+                  )
     0 // 返回整数退出代码

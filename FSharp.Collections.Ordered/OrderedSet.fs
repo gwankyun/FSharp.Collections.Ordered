@@ -3,6 +3,24 @@ open FSharpx.Collections
 open FSharpx.Functional
 open FSharpx.Functional.Prelude
 
+type SkipMap<'a, 'b>(list : ('a * 'b) list list, compare : 'a -> 'a -> bool) =
+    class
+        member x.Data = list
+        member x.Compare = compare
+    end
+
+module SkipMap =
+    begin 
+        let emptyWith compare =
+            SkipMap(List.empty, compare)
+
+        //let add (k : 'k) (v : 'v) (map : SkipMap<'k, 'v>) =
+        //    let data = map.Data in 
+        //    let compare = map.Compare
+        //    match data with 
+        //    | [] -> 
+    end
+
 module Seq =
     begin
         let (|IsEmpty|_|) (set : 'a seq) =
@@ -18,6 +36,8 @@ type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k op
         member x.First = first
         member x.Map = map
         member x.Last = last
+        override x.ToString() =
+            map.ToString()
         //static member op_Equality (x : OrderedSet<'k>, y : OrderedSet<'k>) =
         //    x.First = y.First && x.Last = y.Last && x.Map = y.Map
         //static member op_Inequality (x : OrderedSet<'k>, y : OrderedSet<'k>) =

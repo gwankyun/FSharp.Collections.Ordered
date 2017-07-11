@@ -220,16 +220,12 @@ module OrderedMap =
             |> List.toSeq
 
         let updateWith (f : 'v -> 'v option) (key : 'k) (set : OrderedMap<'k, 'v>) =
-            match (set |> tryFind key) with
+            match set |> tryFind key with
             | Some(v) ->
-                let set =
-                    set
-                    |> remove key
-                in
                 match f v with
                 | Some(value) ->
                     set
                     |> add key value
-                | None -> set
+                | None -> set |> remove key
             | None -> set
     end

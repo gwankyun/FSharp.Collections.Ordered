@@ -8,6 +8,8 @@ type OrderedMultiMap<'k, 'v  when 'k : comparison and 'v : comparison>(map : Ord
         member this.First = map.First
         member this.Last = map.Last
         member this.Map = map
+        override this.ToString() =
+            map.ToString()
     end
 
 module OrderedMultiMap =
@@ -27,8 +29,11 @@ module OrderedMultiMap =
             OrderedMap.empty |> ofOrderedMap
 
         let add (key : 'k) (value : 'v) (set : OrderedMultiMap<'k, 'v>) =
+            let valueSingleton () = OrderedSet.singleton value in 
             match set with
-            | IsEmpty -> empty
+            | IsEmpty ->
+                OrderedMap.empty
+                |> OrderedMap.add key (valueSingleton())
             | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
@@ -38,12 +43,10 @@ module OrderedMultiMap =
                     let value = v |> OrderedSet.add value in 
                     map
                     |> OrderedMap.updateWith (fun _ -> Some (value)) key
-                    |> ofOrderedMap
                 | None ->
-                    let value = OrderedSet.singleton value in
                     map
-                    |> OrderedMap.add key value
-                    |> ofOrderedMap
+                    |> OrderedMap.add key (valueSingleton())
+            |> ofOrderedMap
 
         let containsKey (key : 'k) (set : OrderedMultiMap<'k, 'v>) =
             set.Map |> OrderedMap.containsKey key
