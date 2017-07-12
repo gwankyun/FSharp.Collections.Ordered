@@ -4,6 +4,45 @@ open FSharpx.Functional
 open FSharpx.Functional.Prelude
 open System.Linq
 open Collections.Immutable
+open System.Collections.Immutable
+
+type SkipList<'a>(data : ImmutableList<ImmutableList<'a>>, comparer : 'a -> 'a -> int) =
+    class 
+        member x.Data = data
+        member x.Comparer = comparer
+    end
+
+
+module SkipList =
+    begin
+        let randomLevel () =
+            let rand = new System.Random() in
+            let mutable level : int = 1 in 
+            while rand.Next(0, 1) > 0 do 
+                level <- level + 1
+            done 
+            level
+
+        let emptyWith (comparer : 'a -> 'a -> int) = 
+            SkipList(ImmutableList.empty, comparer)
+
+        let isEmpty (list : SkipList<'a>) =
+            list.Data |> ImmutableList.isEmpty
+
+        let add (value : 'a) (list : SkipList<'a>) =
+            let data = list.Data in 
+            let comparer = list.Comparer in
+            match list |> isEmpty with 
+            | true ->
+                SkipList(value 
+                         |> ImmutableList.singleton 
+                         |> ImmutableList.singleton, comparer)
+            | false ->
+                emptyWith comparer
+                //let level = randomLevel() in 
+                //let rec inner n d =
+                //    match n = 
+    end
 
 //type SkipMap<'a, 'b>(list : PersistentVector<'a>, compare : 'a -> 'a -> bool) =
 //    class

@@ -64,4 +64,10 @@ module ImmutableList =
                 None
 
         let empty<'a> : ImmutableList<'a> = ImmutableList<'a>.Empty
+
+        let isEmpty (list : ImmutableList<'a>) = list.IsEmpty
+
+        let singleton (value : 'a) =
+            empty
+            |> add value
     end
