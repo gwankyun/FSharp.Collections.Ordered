@@ -2,24 +2,26 @@
 open FSharpx.Collections
 open FSharpx.Functional
 open FSharpx.Functional.Prelude
+open System.Linq
+open Collections.Immutable
 
-type SkipMap<'a, 'b>(list : ('a * 'b) list list, compare : 'a -> 'a -> bool) =
-    class
-        member x.Data = list
-        member x.Compare = compare
-    end
+//type SkipMap<'a, 'b>(list : PersistentVector<'a>, compare : 'a -> 'a -> bool) =
+//    class
+//        member x.Data = list
+//        member x.Compare = compare
+//    end
 
-module SkipMap =
-    begin 
-        let emptyWith compare =
-            SkipMap(List.empty, compare)
+//module SkipMap =
+//    begin 
+//        let emptyWith compare =
+//            SkipMap(List.empty, compare)
 
-        //let add (k : 'k) (v : 'v) (map : SkipMap<'k, 'v>) =
-        //    let data = map.Data in 
-        //    let compare = map.Compare
-        //    match data with 
-        //    | [] -> 
-    end
+//        //let add (k : 'k) (v : 'v) (map : SkipMap<'k, 'v>) =
+//        //    let data = map.Data in 
+//        //    let compare = map.Compare
+//        //    match data with 
+//        //    | [] -> 
+//    end
 
 module Seq =
     begin

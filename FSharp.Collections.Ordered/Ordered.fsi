@@ -10,16 +10,6 @@ namespace FSharp.Collections.Ordered
     end
 
 namespace OrderedCollection
-  type SkipMap<'a,'b> =
-    class
-      new : list:('a * 'b) list list * compare:('a -> 'a -> bool) ->
-              SkipMap<'a,'b>
-      member Compare : ('a -> 'a -> bool)
-      member Data : ('a * 'b) list list
-    end
-  module SkipMap = begin
-    val emptyWith : compare:('a -> 'a -> bool) -> SkipMap<'a,'b>
-  end
   module Seq = begin
     val ( |IsEmpty|_| ) : set:seq<'a> -> unit option
   end
