@@ -1,7 +1,5 @@
 
 
-
-
 namespace FSharp.Collections.Ordered
   type Class1 =
     class
@@ -10,6 +8,20 @@ namespace FSharp.Collections.Ordered
     end
 
 namespace OrderedCollection
+  type SkipList<'a> =
+    class
+      new : data:System.Collections.Immutable.ImmutableList<System.Collections.Immutable.ImmutableList<'a>> *
+            comparer:('a -> 'a -> int) -> SkipList<'a>
+      member Comparer : ('a -> 'a -> int)
+      member
+        Data : System.Collections.Immutable.ImmutableList<System.Collections.Immutable.ImmutableList<'a>>
+    end
+  module SkipList = begin
+    val randomLevel : unit -> int
+    val emptyWith : comparer:('a -> 'a -> int) -> SkipList<'a>
+    val isEmpty : list:SkipList<'a> -> bool
+    val add : value:'a -> list:SkipList<'a> -> SkipList<'a>
+  end
   module Seq = begin
     val ( |IsEmpty|_| ) : set:seq<'a> -> unit option
   end
@@ -282,4 +294,6 @@ namespace OrderedCollection
       set:OrderedMultiMap<'k,'v> -> seq<'k * 'v>
         when 'k : comparison and 'v : comparison
   end
+
+
 
