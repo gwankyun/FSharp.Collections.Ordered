@@ -219,13 +219,21 @@ module OrderedMap =
             |> toList
             |> List.toSeq
 
+        let update (key : 'k) (value : 'v) (set : OrderedMap<'k, 'v>) =
+            let m = set.Map in
+            let (p, _, n) = m.[key] in
+            let fst = set.First in
+            let lst = set.Last in
+            OrderedMap(fst, m |> Map.add key (p, value, n), lst)
+
         let updateWith (f : 'v -> 'v option) (key : 'k) (set : OrderedMap<'k, 'v>) =
             match set |> tryFind key with
             | Some(v) ->
                 match f v with
                 | Some(value) ->
-                    set
-                    |> add key value
+                    //set
+                    //|> add key value
+                    set |> update key value
                 | None -> set |> remove key
             | None -> set
     end

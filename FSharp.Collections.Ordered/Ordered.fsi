@@ -196,6 +196,9 @@ namespace OrderedCollection
     val toSeq :
       set:OrderedMap<'k,'v> -> seq<'k * 'v>
         when 'k : comparison and 'v : comparison
+    val update :
+      key:'k -> value:'v -> set:OrderedMap<'k,'v> -> OrderedMap<'k,'v>
+        when 'k : comparison and 'v : comparison
     val updateWith :
       f:('v -> 'v option) ->
         key:'k -> set:OrderedMap<'k,'v> -> OrderedMap<'k,'v>

@@ -239,12 +239,15 @@ type OrderedMapProperties =
             let ra =
                 match m |> OrderedMap.tryFind key with
                 | Some(value) ->
-                    let m = m |> OrderedMap.remove key in
+                    //let m = m |> OrderedMap.remove key in
                     match f value with
                     | Some(v) ->
-                        m
-                        |> OrderedMap.add key v
-                    | None -> m
+                        //m
+                        //|> OrderedMap.add key v
+                        m |> OrderedMap.update key v
+                    | None ->
+                        // m
+                        m |> OrderedMap.remove key
                 | None -> m
             in
             ra = (m |> OrderedMap.updateWith f key)
