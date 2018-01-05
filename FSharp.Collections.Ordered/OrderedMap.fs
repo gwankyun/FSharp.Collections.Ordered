@@ -23,8 +23,6 @@ type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : 
 
 module OrderedMap =
     begin
-        //let flip f a b = f b a
-
         let isEmpty (set : OrderedMap<'k, 'v>) =
             set.Map |> Map.isEmpty
 
@@ -231,9 +229,8 @@ module OrderedMap =
             | Some(v) ->
                 match f v with
                 | Some(value) ->
-                    //set
-                    //|> add key value
-                    set |> update key value
+                    set
+                    |> add key value
                 | None -> set |> remove key
             | None -> set
     end

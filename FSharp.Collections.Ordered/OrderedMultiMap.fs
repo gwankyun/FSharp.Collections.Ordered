@@ -29,11 +29,11 @@ module OrderedMultiMap =
             OrderedMap.empty |> ofOrderedMap
 
         let add (key : 'k) (value : 'v) (set : OrderedMultiMap<'k, 'v>) =
-            let valueSingleton () = OrderedSet.singleton value in 
+            let valueSingleton = OrderedSet.singleton value in 
             match set with
             | IsEmpty ->
                 OrderedMap.empty
-                |> OrderedMap.add key (valueSingleton())
+                |> OrderedMap.add key valueSingleton
             | _ ->
                 let first = set.First |> Option.get in
                 let last = set.Last |> Option.get in
@@ -45,7 +45,7 @@ module OrderedMultiMap =
                     |> OrderedMap.updateWith (fun _ -> Some (value)) key
                 | None ->
                     map
-                    |> OrderedMap.add key (valueSingleton())
+                    |> OrderedMap.add key valueSingleton
             |> ofOrderedMap
 
         let containsKey (key : 'k) (set : OrderedMultiMap<'k, 'v>) =

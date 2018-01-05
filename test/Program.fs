@@ -265,6 +265,8 @@ type OrderedMapProperties =
 
 type OrderedMultiMapProperties =
     class 
+        static member ``ofList and toList`` (xs : (int * int) list) (k : int) (v : int) =
+            xs |> OrderedMultiMap.ofList |> OrderedMultiMap.toList = (xs |> List.distinct)
         static member add (xs : (int * int) list) (k : int) (v : int) =
             (xs |> OrderedMultiMap.ofList |> OrderedMultiMap.add k v |> OrderedMultiMap.toList) =
                 (xs |> List.append [(k, v)] |> OrderedMultiMap.ofList |> OrderedMultiMap.toList)
