@@ -72,7 +72,6 @@ module Seq =
 
 //[<CustomEquality; NoComparison>]
 type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
-//type OrderedSet<'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
     class
         member x.First = first
         member x.Map = map
@@ -86,7 +85,8 @@ type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k op
         override x.GetHashCode() = hash x.Map
         override x.Equals(y : obj) =
             match y with
-            | :? OrderedSet<'k> as y -> (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> Map.isEmpty && y.Map |> Map.isEmpty)
+            | :? OrderedSet<'k> as y ->
+                (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> Map.isEmpty && y.Map |> Map.isEmpty)
             | _ -> false
         interface System.IComparable
             with

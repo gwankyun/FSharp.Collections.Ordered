@@ -13,7 +13,8 @@ type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : 
         override x.GetHashCode() = hash x.First
         override x.Equals(y : obj) =
             match y with
-            | :? OrderedMap<'k, 'v> as y -> (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> Map.isEmpty && y.Map |> Map.isEmpty)
+            | :? OrderedMap<'k, 'v> as y ->
+                (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> Map.isEmpty && y.Map |> Map.isEmpty)
             | _ -> false
         interface System.IComparable
             with

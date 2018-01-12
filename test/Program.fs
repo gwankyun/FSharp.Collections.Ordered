@@ -263,21 +263,42 @@ type OrderedMapProperties =
         //        (m |> OrderedMap.remove k |> OrderedMap.toList) = (list |> List.filter (fun (a, b) -> a = k)) 
     end
 
+let listToOrderedMap(ls : ('a * 'b) list) =
+    List.fold (fun s (k, v) ->
+        match s |> OrderedMap.tryFind k with
+        | Some m -> s |> OrderedMap.add k (m |> OrderedSet.add v)
+        | None -> s |> OrderedMap.add k (v |> OrderedSet.singleton)
+    ) OrderedMap.empty ls
+
+let OrderedMapToList (m : OrderedMap<'a, OrderedSet<'b>>) =
+    m
+    |> OrderedMap.toList
+    |> List.map (fun (k, v) -> v |> OrderedSet.toList |> List.map (fun x -> (k, x)))
+    |> List.reduce List.append
+    //|> OrderedMap.map (fun k v -> v |> OrderedSet.map (fun x -> (k, x)) |> OrderedSet.toList)
+
 type OrderedMultiMapProperties =
     class 
-        static member ``ofList and toList`` (xs : (int * int) list) (k : int) (v : int) =
-            xs |> OrderedMultiMap.ofList |> OrderedMultiMap.toList = (xs |> List.distinct)
-        static member add (xs : (int * int) list) (k : int) (v : int) =
-            (xs |> OrderedMultiMap.ofList |> OrderedMultiMap.add k v |> OrderedMultiMap.toList) =
-                (xs |> List.append [(k, v)] |> OrderedMultiMap.ofList |> OrderedMultiMap.toList)
-        //static member ofList (xs : Map<int, int>) =
-        //    let keys = xs |> Map.keys |> List.ofSeq in
-        //    (keys |> List.map (fun x -> x, xs.[x]) |> OrderedMap.ofList |> OrderedMap.toList) = (keys |> List.map (fun x -> x, xs.[x]))
         static member isEmpty (xs : (int * int) list) =
             let keys = toAssocList xs in 
             xs 
             |> OrderedMultiMap.ofList 
             |> OrderedMultiMap.isEmpty = (keys |> List.isEmpty)
+        static member ofList (xs : (int * int) list) =
+            (xs |> OrderedMultiMap.ofList).Map = (xs |> listToOrderedMap)
+        //static member ``fold`` (xs : (int * int) list) =
+        //    xs |> OrderedMultiMap.fo
+        static member toList (xs : (int * int) list) =
+            match xs |> List.isEmpty with
+            | true -> true
+            | false ->
+                xs |> OrderedMultiMap.ofList |> OrderedMultiMap.toList = (xs |> listToOrderedMap |> OrderedMapToList)
+        static member add (xs : (int * int) list) (k : int) (v : int) =
+            (xs |> OrderedMultiMap.ofList |> OrderedMultiMap.add k v |> OrderedMultiMap.toList) =
+                (xs |> List.append [(k, v)] |> listToOrderedMap |> OrderedMapToList)
+        //static member ofList (xs : Map<int, int>) =
+        //    let keys = xs |> Map.keys |> List.ofSeq in
+        //    (keys |> List.map (fun x -> x, xs.[x]) |> OrderedMap.ofList |> OrderedMap.toList) = (keys |> List.map (fun x -> x, xs.[x]))
     end
 
 let printApply f =

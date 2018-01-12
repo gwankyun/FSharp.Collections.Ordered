@@ -206,9 +206,13 @@ namespace OrderedCollection
   end
 
 namespace OrderedCollection
-  type OrderedMultiMap<'k,'v when 'k : comparison and 'v : comparison> =
+  type OrderedMultiMap<[<EqualityConditionalOnAttribute ()>] 'k,'v
+                         when [<EqualityConditionalOnAttribute ()>] 'k : comparison and
+                              'v : comparison> =
     class
       new : map:OrderedMap<'k,OrderedSet<'v>> -> OrderedMultiMap<'k,'v>
+      override Equals : y:obj -> bool
+      override GetHashCode : unit -> int
       override ToString : unit -> string
       member First : 'k option
       member Last : 'k option

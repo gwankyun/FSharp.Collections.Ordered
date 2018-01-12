@@ -3,13 +3,19 @@ open FSharpx.Collections
 open FSharpx.Functional
 open FSharpx.Functional.Prelude
 
-type OrderedMultiMap<'k, 'v  when 'k : comparison and 'v : comparison>(map : OrderedMap<'k, OrderedSet<'v>>) =
+type OrderedMultiMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : comparison>(map : OrderedMap<'k, OrderedSet<'v>>) =
     class
         member this.First = map.First
         member this.Last = map.Last
         member this.Map = map
         override this.ToString() =
             map.ToString()
+        override x.GetHashCode() = hash x.First
+        override x.Equals(y : obj) =
+            match y with
+            | :? OrderedMultiMap<'k, 'v> as y ->
+                (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> OrderedMap.isEmpty && y.Map |> OrderedMap.isEmpty)
+            | _ -> false
     end
 
 module OrderedMultiMap =
@@ -42,7 +48,8 @@ module OrderedMultiMap =
                 | Some (v) ->
                     let value = v |> OrderedSet.add value in 
                     map
-                    |> OrderedMap.updateWith (fun _ -> Some (value)) key
+                    //|> OrderedMap.updateWith (fun _ -> Some (value)) key
+                    |> OrderedMap.add key value
                 | None ->
                     map
                     |> OrderedMap.add key valueSingleton
