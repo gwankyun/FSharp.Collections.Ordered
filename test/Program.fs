@@ -345,4 +345,23 @@ let main argv =
     printfn "%A" ([(1, 1);(2,2);(3,3);(1, 2)]
                   |> OrderedMultiMap.ofList
                   )
+
+    printfn "set:%A" ([1..9] |> OrderedSet.ofList)
+
+    //let printOrderedSet (set : OrderedSet<'a>) =
+    //    let fst = set.First in
+    //    let lst = set.Last in
+    //    let map = set.Map in
+    //    map.[fst] :: 
+
+    //printOrderedSet ([1..9] |> OrderedSet.ofList)
+
+    let OrderedSetToList (set : OrderedSet<'k>) =
+        let fst = set.First in
+        let lst = set.Last in
+        lst
+
+    //[1..9]
+    //|> OrderedSet.ofList
+    //|> OrderedSet.iter (fun x -> printfn "%A" x)
     0 // 返回整数退出代码

@@ -3,7 +3,7 @@ open FSharpx.Collections
 open FSharpx.Functional
 open FSharpx.Functional.Prelude
 
-type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : comparison>(first : 'k option, table : Map<'k, ('k * 'v * 'k)>, last : 'k option) =
+type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : comparison>(first : 'k option, table : Map<'k, ('k option * 'v * 'k option)>, last : 'k option) =
     class
         member this.First = first
         member this.Last = last
@@ -37,7 +37,7 @@ module OrderedMap =
             | IsEmpty ->
                 let first = Some key in
                 let last = Some key in
-                let map = Map.empty |> Map.add key (key, value, key) in
+                let map = Map.empty |> Map.add key (None, value, None) in
                 OrderedMap(first, map, last)
             | _ ->
                 let first = set.First |> Option.get in
@@ -54,8 +54,8 @@ module OrderedMap =
                     let (prev, _, _) = map |> Map.find last in
                     let map =
                         map
-                        |> Map.updateWith (fun (prev, v, _) -> Some (prev, v, key)) last
-                        |> Map.add key (last, value, key)
+                        |> Map.updateWith (fun (prev, v, _) -> Some (prev, v, Some key)) last
+                        |> Map.add key (set.Last, value, None)
                     in
                     OrderedMap(Some first, map, Some key)
 
@@ -81,44 +81,40 @@ module OrderedMap =
                     match k = last with
                     | true -> s
                     | false ->
-                        inner s next
+                        inner s next.Value
                 inner state first
         
         let remove (key : 'k) (set : OrderedMap<'k, 'v>) =
             match set with
             | IsEmpty -> empty
             | _ ->
-                let first = set.First |> Option.get in
-                let last = set.Last |> Option.get in
+                let first = set.First in
+                let last = set.Last in
                 let map = set.Map in
                 match map |> Map.tryFind key with
-                | Some (prev, _, next) ->
-                    match (key = first, key = last) with
-                    | (true, true) -> empty // 只有一個鍵
-                    | (true, false) -> // 第一個
-                        //let first = next in
-                        let map =
-                            map
-                            |> Map.remove key
-                            |> Map.updateWith (fun (_, v, n) -> Some (next, v, n)) next
+                | Some (None, _, None) -> empty
+                | Some (None, _, Some next) ->
+                    let map =
+                        map
+                        |> Map.remove key
+                        |> Map.updateWith (fun (_, v, n) -> Some (None, v, n)) next
                         in
-                        OrderedMap(Some next, map, Some last)
-                    | (false, true) ->
-                        //let last = prev in
-                        let map =
-                            map
-                            |> Map.remove key
-                            |> Map.updateWith (fun (p, v, _) -> Some (p, v, prev)) prev
+                        OrderedMap(Some next, map, last)
+                | Some (Some prev, _, None) ->
+                    let map =
+                        map
+                        |> Map.remove key
+                        |> Map.updateWith (fun (p, v, _) -> Some (p, v, None)) prev
                         in
-                        OrderedMap(Some first, map, Some prev)
-                    | (false, false) ->
-                        let map =
-                            map
-                            |> Map.remove key
-                            |> Map.updateWith (fun (p, v, _) -> Some (p, v, next)) prev
-                            |> Map.updateWith (fun (_, v, n) -> Some (prev, v, n)) next
+                        OrderedMap(first, map, Some prev)
+                | Some (Some prev, _, Some next) ->
+                    let map =
+                        map
+                        |> Map.remove key
+                        |> Map.updateWith (fun (p, v, _) -> Some (p, v, Some next)) prev
+                        |> Map.updateWith (fun (_, v, n) -> Some (Some prev, v, n)) next
                         in
-                        OrderedMap(Some first, map, Some last)
+                        OrderedMap(first, map, Some prev)
                 | None -> set
             
         let exists (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
@@ -201,7 +197,7 @@ module OrderedMap =
                     | true ->
                         s
                     | false ->
-                        inner s prev
+                        inner s prev.Value
                 inner state last
 
         let toList (set : OrderedMap<'k, 'v>) =

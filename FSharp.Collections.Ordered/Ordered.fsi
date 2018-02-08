@@ -29,14 +29,14 @@ namespace OrderedCollection
                     when [<EqualityConditionalOnAttribute ()>] 'k : comparison> =
     class
       interface System.IComparable
-      new : first:'k option * map:Map<'k,('k * 'k)> * last:'k option ->
-              OrderedSet<'k>
+      new : first:'k option * map:Map<'k,('k option * 'k option)> *
+            last:'k option -> OrderedSet<'k>
       override Equals : y:obj -> bool
       override GetHashCode : unit -> int
       override ToString : unit -> string
       member First : 'k option
       member Last : 'k option
-      member Map : Map<'k,('k * 'k)>
+      member Map : Map<'k,('k option * 'k option)>
     end
   module OrderedSet = begin
     val isEmpty : set:OrderedSet<'k> -> bool when 'k : comparison
@@ -60,8 +60,7 @@ namespace OrderedCollection
       predicate:('k -> bool) -> set:OrderedSet<'k> -> OrderedSet<'k>
         when 'k : comparison
     val iter :
-      action:('k -> unit) -> set:OrderedSet<'k> -> OrderedSet<'a>
-        when 'k : comparison and 'a : comparison
+      action:('k -> unit) -> set:OrderedSet<'k> -> unit when 'k : comparison
     val forall :
       predicate:('k -> bool) -> set:OrderedSet<'k> -> bool when 'k : comparison
     val intersect :
@@ -109,14 +108,14 @@ namespace OrderedCollection
                          'v : comparison> =
     class
       interface System.IComparable
-      new : first:'k option * table:Map<'k,('k * 'v * 'k)> * last:'k option ->
-              OrderedMap<'k,'v>
+      new : first:'k option * table:Map<'k,('k option * 'v * 'k option)> *
+            last:'k option -> OrderedMap<'k,'v>
       override Equals : y:obj -> bool
       override GetHashCode : unit -> int
       override ToString : unit -> string
       member First : 'k option
       member Last : 'k option
-      member Map : Map<'k,('k * 'v * 'k)>
+      member Map : Map<'k,('k option * 'v * 'k option)>
     end
   module OrderedMap = begin
     val isEmpty :

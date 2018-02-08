@@ -71,7 +71,7 @@ module Seq =
     end
 
 //[<CustomEquality; NoComparison>]
-type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k * 'k)>, last : 'k option) =
+type OrderedSet<[<EqualityConditionalOn>] 'k when 'k : comparison>(first : 'k option, map : Map<'k, ('k option * 'k option)>, last : 'k option) =
     class
         member x.First = first
         member x.Map = map
@@ -109,7 +109,7 @@ module OrderedSet =
             | IsEmpty ->
                 let first = Some value in
                 let last = Some value in
-                let map = Map.empty |> Map.add value (value, value) in
+                let map = Map.empty |> Map.add value (None, None) in
                 OrderedSet(first, map, last)
             | _ ->
                 let first = set.First |> Option.get in
@@ -122,8 +122,8 @@ module OrderedSet =
                     let (prev, _) = map |> Map.find last in
                     let map =
                         map
-                        |> Map.updateWith (fun (prev, _) -> Some (prev, value)) last
-                        |> Map.add value (last, value)
+                        |> Map.updateWith (fun (prev, _) -> Some (prev, Some value)) last
+                        |> Map.add value (Some last, None)
                     in
                     OrderedSet(Some first, map, Some value)
 
@@ -149,7 +149,7 @@ module OrderedSet =
                     | false ->
                         let map = set.Map in
                         let (_, next) = map.[t] in
-                        inner s next
+                        inner s (next |> Option.get)
                 in
                 inner state first
 
@@ -157,37 +157,34 @@ module OrderedSet =
             match set with
             | IsEmpty -> set
             | _ ->
-                let first = set.First |> Option.get in
-                let last = set.Last |> Option.get in
+                let first = set.First in
+                let last = set.Last in
                 let map = set.Map in
                 match map |> Map.tryFind value with
-                | Some (prev, next) ->
-                    let map = map |> Map.remove value in
-                    match (prev = value, next = value) with
-                    | (true, true) ->
-                        //OrderedSet(Some first, map, Some last)
-                        empty
-                    | (true, _) -> // 第一個元素
-                        let first = next in// 第二個
-                        let map =
-                            map
-                            |> Map.updateWith (fun (_, n) -> Some (next, n)) next // 將前節點改爲自己
-                        in
-                        OrderedSet(Some first, map, Some last)
-                    | (_, true) -> // 最后一个元素
-                        let last = prev in//  
-                        let map =
-                            map
-                            |> Map.updateWith (fun (p, _) -> Some (p, prev)) prev
-                        in
-                        OrderedSet(Some first, map, Some last)
-                    | (_, _) ->
-                        let map =
-                            map
-                            |> Map.updateWith (fun (p, _) -> Some (p, next)) prev
-                            |> Map.updateWith (fun (_, n) -> Some (prev, n)) next
-                        in
-                        OrderedSet(Some first, map, Some last)
+                | Some (None, None) ->
+                    empty
+                | Some (None, Some next) ->
+                    let map =
+                        map
+                        |> Map.remove value
+                        |> Map.updateWith (fun (_, n) -> Some (None, n)) next
+                    in
+                    OrderedSet(Some next, map, last)
+                | Some (Some prev, None) ->
+                    let map =
+                        map
+                        |> Map.remove value
+                        |> Map.updateWith (fun (p, _) -> Some (p, None)) prev
+                    in
+                    OrderedSet(set.First, map, Some prev)
+                | Some (Some prev, Some next) ->
+                    let map =
+                        map
+                        |> Map.remove value
+                        |> Map.updateWith (fun (p, _) -> Some (p, Some next)) prev
+                        |> Map.updateWith (fun (_, n) -> Some (Some prev, n)) next
+                    in
+                    OrderedSet(first, map, last)
                 | None -> set
 
         let difference (set1 : OrderedSet<'k>) (set2 : OrderedSet<'k>) =
@@ -211,6 +208,7 @@ module OrderedSet =
                     a;
                 end
                 ) empty
+            |> ignore
 
         let forall (predicate : 'k -> bool) (set : OrderedSet<'k>) =
             set.Map |> Map.forall (fun k _ -> predicate k)
@@ -278,7 +276,7 @@ module OrderedSet =
                     | false ->
                         let map = set.Map in
                         let (prev, _) = map.[t] in
-                        inner s prev
+                        inner s prev.Value
                 inner state last
 
         let toList (set : OrderedSet<'k>) =
