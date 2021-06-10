@@ -1,233 +1,148 @@
-﻿namespace OrderedCollection
-open FSharpx.Collections
-open FSharpx.Functional
-open FSharpx.Functional.Prelude
+﻿//namespace Ordered
+namespace FSharp.Collections.Ordered
 
-type OrderedMap<[<EqualityConditionalOn>] 'k, 'v  when 'k : comparison and 'v : comparison>(first : 'k option, table : Map<'k, ('k option * 'v * 'k option)>, last : 'k option) =
-    class
-        member this.First = first
-        member this.Last = last
-        member this.Map = table
-        override x.ToString() =
-            table.ToString()
-        override x.GetHashCode() = hash x.First
-        override x.Equals(y : obj) =
-            match y with
-            | :? OrderedMap<'k, 'v> as y ->
-                (x.First = y.First && x.Last = y.Last && x.Map = y.Map) || (x.Map |> Map.isEmpty && y.Map |> Map.isEmpty)
-            | _ -> false
-        interface System.IComparable
-            with
-                member this.CompareTo(o : obj) = 0
-            end
-    end
+type OrderedMap<'a, 'b when 'a : comparison> =
+    { 
+        Table: Map<'a, (int * 'b)>; 
+        Index: int;
+    }
 
 module OrderedMap =
-    begin
-        let isEmpty (set : OrderedMap<'k, 'v>) =
-            set.Map |> Map.isEmpty
+    let empty : OrderedMap<'a, 'b> =
+        { Table = Map.empty; Index = 0; }
 
-        let (|IsEmpty|_|) (set : OrderedMap<'k, 'v>) =
-            match set |> isEmpty with
-            | true -> Some()
-            | false -> None
+    let isEmpty (table: OrderedMap<'a, 'b>) : bool =
+        table.Table |> Map.isEmpty
 
-        let add (key : 'k) (value : 'v) (set : OrderedMap<'k, 'v>) =
-            match set with
-            | IsEmpty ->
-                let first = Some key in
-                let last = Some key in
-                let map = Map.empty |> Map.add key (None, value, None) in
-                OrderedMap(first, map, last)
-            | _ ->
-                let first = set.First |> Option.get in
-                let last = set.Last |> Option.get in
-                let map = set.Map in
-                match map |> Map.tryFind key with
-                | Some (_, _, _) ->
-                    let map =
-                        map
-                        |> Map.updateWith (fun (prev, _, next) -> Some (prev, value, next)) key
-                    in
-                    OrderedMap(Some first, map, Some last)
-                | None ->
-                    let (prev, _, _) = map |> Map.find last in
-                    let map =
-                        map
-                        |> Map.updateWith (fun (prev, v, _) -> Some (prev, v, Some key)) last
-                        |> Map.add key (set.Last, value, None)
-                    in
-                    OrderedMap(Some first, map, Some key)
+    let count (table: OrderedMap<'a, 'b>) : int =
+        table.Table |> Map.count
 
-        let containsKey (key : 'k) (set : OrderedMap<'k, 'v>) =
-            set.Map |> Map.containsKey key
+    let containsKey (key: 'a) (table: OrderedMap<'a, 'b>) : bool =
+        table.Table |> Map.containsKey key
 
-        let count (set : OrderedMap<'k, 'v>) =
-            set.Map |> Map.count
+    let exists (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : bool =
+        table.Table |> Map.exists (fun k (_, v) -> predicate k v)
 
-        let empty<'k, 'v  when 'k : comparison and 'v : comparison> : OrderedMap<'k, 'v> =
-            OrderedMap(None, Map.empty, None)
+    let add (key: 'a) (value: 'b) (table: OrderedMap<'a, 'b>) : OrderedMap<'a, 'b> =
+        let m = table.Table
+        match m |> Map.tryFind key with
+        | Some (i, v) -> { table with Table = m |> Map.add key (i, value) }
+        | None ->
+            let i = table.Index
+            let t =  m |> Map.add key (i, value)
+            { table with Table = t; Index = i + 1; }
 
-        let fold (folder : 's -> 'k -> 'v -> 's) (state : 's) (set : OrderedMap<'k, 'v>) =
-            match set with
-            | IsEmpty -> state
-            | _ ->
-                let first = set.First |> Option.get in
-                let last = set.Last |> Option.get in
-                let rec inner s k =
-                    let map = set.Map in
-                    let (_, v, next) = map.[k] in
-                    let s = folder s k v in
-                    match k = last with
-                    | true -> s
-                    | false ->
-                        inner s next.Value
-                inner state first
-        
-        let remove (key : 'k) (set : OrderedMap<'k, 'v>) =
-            match set with
-            | IsEmpty -> empty
-            | _ ->
-                let first = set.First in
-                let last = set.Last in
-                let map = set.Map in
-                match map |> Map.tryFind key with
-                | Some (None, _, None) -> empty
-                | Some (None, _, Some next) ->
-                    let map =
-                        map
-                        |> Map.remove key
-                        |> Map.updateWith (fun (_, v, n) -> Some (None, v, n)) next
-                        in
-                        OrderedMap(Some next, map, last)
-                | Some (Some prev, _, None) ->
-                    let map =
-                        map
-                        |> Map.remove key
-                        |> Map.updateWith (fun (p, v, _) -> Some (p, v, None)) prev
-                        in
-                        OrderedMap(first, map, Some prev)
-                | Some (Some prev, _, Some next) ->
-                    let map =
-                        map
-                        |> Map.remove key
-                        |> Map.updateWith (fun (p, v, _) -> Some (p, v, Some next)) prev
-                        |> Map.updateWith (fun (_, v, n) -> Some (Some prev, v, n)) next
-                        in
-                        OrderedMap(first, map, Some prev)
-                | None -> set
-            
-        let exists (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            let map = set.Map in
-            map |> Map.exists (fun k v ->
-                                begin
-                                    let (_, v, _) = map.[k];
-                                    predicate k v;
-                                end
-                                    )
-            
-        let filter (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            fold (fun s k v ->
-                match (predicate k v) with
-                | true -> s |> add k v
-                | false -> s)
-                empty set
-                
-        let find (key : 'k) (set : OrderedMap<'k, 'v>) =
-            let (_, value, _) = set.Map.[key] in
-            value
-            
-        let tryFind (key : 'k) (set : OrderedMap<'k, 'v>) =
-            set.Map
-            |> Map.tryFind key
-            |> Option.map (fun (_, v, _) -> v)
+    let remove (key: 'a) (table: OrderedMap<'a, 'b>) : OrderedMap<'a, 'b> =
+        { table with Table = table.Table |> Map.remove key; }
 
-        let findKey (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            set.Map |> Map.findKey (fun k (_, v, _) -> predicate k v)
+    let ofList (elements: ('a * 'b) list) : OrderedMap<'a, 'b> =
+        elements
+        |> List.fold (fun s (k, v) -> s |> add k v) empty
 
-        let tryFindKey (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            set.Map |> Map.tryFindKey (fun k (_, v, _) -> predicate k v)
-                
-        let iter (action : 'k -> 'v -> unit) (set : OrderedMap<'k, 'v>) =
-            fold (fun s k v ->
-                begin
-                    action k v;
-                    s;
-                end) empty set
+    let ofArray (elements: ('a * 'b) []) : OrderedMap<'a, 'b> =
+        elements
+        |> Array.fold (fun s (k, v) -> s |> add k v) empty
 
-        let forall (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            let map = set.Map in
-            map |> Map.forall (fun k v ->
-                                   let (_, v, _) = map.[k] in
-                                   predicate k v
-                                   )
-        let map (mapping : 'k -> 'v -> 'u) (set : OrderedMap<'k, 'v>) =
-            fold (fun s k v -> s |> add k (mapping k v)) empty set
+    let ofSeq (elements: ('a * 'b) seq) : OrderedMap<'a, 'b> =
+        elements
+        |> Seq.fold (fun s (k, v) -> s |> add k v) empty
 
-        let addTuple s (k, v) =
-            s |> add k v
-            
-        let ofArray (array : ('k * 'v) []) =
-            Array.fold addTuple empty array
-            
-        let ofList (elements : ('k * 'v) list) =
-            List.fold addTuple empty elements
+    let find (key: 'a) (table: OrderedMap<'a, 'b>) : 'b =
+        table.Table
+        |> Map.find key
+        |> snd
 
-        let ofSeq (elements : ('k * 'v) seq) =
-            Seq.fold addTuple empty elements
+    let findKey (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : 'a =
+        table.Table
+        |> Map.findKey (fun k (_, v) -> predicate k v)
 
-        let partition (predicate : 'k -> 'v -> bool) (set : OrderedMap<'k, 'v>) =
-            fold (fun (set1, set2) k v ->
-                match predicate k v with
-                | true -> (set1 |> add k v, set2)
-                | false -> (set1, set2 |> add k v)
-            ) (empty, empty) set
-            
-        let foldBack (folder : 'k -> 'v -> 's -> 's) (set : OrderedMap<'k, 'v>) (state : 's) =
-            match set with
-            | IsEmpty -> state
-            | _ ->
-                let first = set.First |> Option.get in
-                let last = set.Last |> Option.get in
-                let rec inner s k =
-                    let map = set.Map in
-                    let (prev, v, _) = map.[k] in
-                    let s = folder k v s in
-                    match k = first with
-                    | true ->
-                        s
-                    | false ->
-                        inner s prev.Value
-                inner state last
+    let tryFind (key: 'a) (table: OrderedMap<'a, 'b>) : 'b option =
+        table.Table
+        |> Map.tryFind key
+        |> Option.map snd
 
-        let toList (set : OrderedMap<'k, 'v>) =
-            foldBack (fun k v s ->
-                (k, v) :: s) set []
+    let tryFindKey (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : 'a option =
+        table.Table
+        |> Map.tryFindKey (fun k (_, v) -> predicate k v)
 
-        let toArray (set : OrderedMap<'k, 'v>) =
-            set
-            |> toList
-            |> List.toArray
+    let toSeq (table: OrderedMap<'a, 'b>) : ('a * 'b) seq =
+        table.Table
+        |> Map.toSeq
+        |> Seq.sortBy fst
+        |> Seq.map (fun (k, (_, v)) -> (k, v))
 
-        let toSeq (set : OrderedMap<'k, 'v>) =
-            set
-            |> toList
-            |> List.toSeq
+    let toList (table: OrderedMap<'a, 'b>) : ('a * 'b) list =
+        table.Table
+        |> Map.toList
+        |> List.sortBy fst
+        |> List.map (fun (k, (_, v)) -> (k, v))
 
-        let update (key : 'k) (value : 'v) (set : OrderedMap<'k, 'v>) =
-            let m = set.Map in
-            let (p, _, n) = m.[key] in
-            let fst = set.First in
-            let lst = set.Last in
-            OrderedMap(fst, m |> Map.add key (p, value, n), lst)
+    let fold (folder: 's -> 'a -> 'b -> 's) (state: 's) (table: OrderedMap<'a, 'b>) : 's =
+        table
+        |> toSeq
+        |> Seq.fold (fun s (k, v) -> folder s k v) state
 
-        let updateWith (f : 'v -> 'v option) (key : 'k) (set : OrderedMap<'k, 'v>) =
-            match set |> tryFind key with
-            | Some(v) ->
-                match f v with
-                | Some(value) ->
-                    set
-                    |> add key value
-                | None -> set |> remove key
-            | None -> set
-    end
+    let partition (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : (OrderedMap<'a, 'b> * OrderedMap<'a, 'b>) =
+        table
+        |> fold (fun (t1, t2) k v ->
+            match predicate k v with
+            | true -> (t1 |> add k v, t2)
+            | false -> (t1, t2 |> add k v))
+            (empty, empty)
+
+    let pick (chooser: 'a -> 'b -> 'c option) (table: OrderedMap<'a, 'b>) : 'c =
+        table
+        |> toList
+        |> List.find (fun (k, v) -> (chooser k v) |> Option.isSome)
+        |> (fun (k, v) -> chooser k v)
+        |> Option.get
+
+    let tryPick (chooser: 'a -> 'b -> 'c option) (table: OrderedMap<'a, 'b>) : 'c option =
+        table
+        |> toList
+        |> List.find (fun (k, v) -> (chooser k v) |> Option.isSome)
+        |> (fun (k, v) -> chooser k v)
+
+    let change (key: 'a) (f: 'b option -> 'b option) (table: OrderedMap<'a, 'b>) : OrderedMap<'a, 'b> =
+        let v = table |> tryFind key
+        let n = f v
+        match n with
+        | Some s -> table |> add key s
+        | None -> table |> remove key
+
+    let foldBack (folder: 'a -> 'b -> 's -> 's) (table: OrderedMap<'a, 'b>) (state: 's) : 's =
+        Seq.foldBack (fun (k, v) s -> folder k v s) (table |> toSeq) state
+
+    let forall (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : bool =
+        table
+        |> toSeq
+        |> Seq.forall (fun (k, v) -> predicate k v)
+
+    let iter (action: 'a -> 'b -> unit) (table: OrderedMap<'a, 'b>) : unit =
+        table
+        |> toSeq
+        |> Seq.iter (fun (k, v) -> action k v)
+
+    let toArray (table: OrderedMap<'a, 'b>) : ('a * 'b) [] =
+        table.Table
+        |> Map.toArray
+        |> Array.sortBy fst
+        |> Array.map (fun (k, (_, v)) -> (k, v))
+
+    let filter (predicate: 'a -> 'b -> bool) (table: OrderedMap<'a, 'b>) : OrderedMap<'a, 'b> =
+        table
+        |> fold (fun s k v ->
+            match predicate k v with
+            | true -> s |> add k v
+            | false -> s
+            ) empty
+
+    let map (mapping: 'a -> 'b -> 'c) (table: OrderedMap<'a, 'b>) : OrderedMap<'a, 'c> =
+        table
+        |> fold (fun s k v -> s |> add k (mapping k v)) empty
+
+    let groupBy (projection: 'a -> 'b -> 'c) (table: OrderedMap<'a, 'b>) : OrderedMap<'c, OrderedMap<'a, 'b>> =
+        table
+        |> toList
+        |> List.groupBy (fun (k, v) -> projection k v)
+        |> List.fold (fun s (k, v) -> s |> add k (v |> ofList)) empty
