@@ -1,5 +1,4 @@
-﻿//namespace Ordered
-namespace FSharp.Collections.Ordered
+﻿namespace FSharp.Collections.Ordered
 
 type OrderedSet<'a when 'a : comparison> =
     { 
@@ -13,6 +12,9 @@ module OrderedSet =
 
     let isEmpty (set: OrderedSet<'a>) : bool =
         set.Table |> Map.isEmpty
+
+    let flip (f: 'a -> 'b -> 'c) : ('b -> 'a -> 'c) =
+        (fun a b -> f b a)
 
     let add (value: 'a) (set: OrderedSet<'a>) : OrderedSet<'a> =
         let table = set.Table
@@ -72,25 +74,35 @@ module OrderedSet =
         |> toList
         |> List.fold folder state
 
+    ///<summary>set1與set2的交集</summary>
     let intersect (set1: OrderedSet<'a>) (set2: OrderedSet<'a>) : OrderedSet<'a> =
         set1
-        |> filter (fun x -> set2 |> contains x)
+        |> filter (set2 |> flip contains)
 
     let union (set1: OrderedSet<'a>) (set2: OrderedSet<'a>) : OrderedSet<'a> =
-        fold (fun s t -> s |> add t) set1 set2
+        fold (flip add) set1 set2
 
-    let intersectMany (sets: OrderedSet<'a> seq) : OrderedSet<'a> =
-        let (h, t) = (sets |> Seq.head, sets |> Seq.tail)
-        t
-        |> Seq.fold (fun s i -> intersect s i) h 
+    module Seq =
+        let headOr (value: 'a) (source: 'a seq) : 'a =
+            match source |> Seq.tryHead with
+            | Some h -> h
+            | None -> value
+
+        let tailOr (value: 'a seq) (source: 'a seq) : 'a seq =
+            match source |> Seq.isEmpty with
+            | true -> value
+            | false -> source |> Seq.tail
 
     let unionMany (sets: OrderedSet<'a> seq) : OrderedSet<'a> =
-        let (h, t) = (sets |> Seq.head, sets |> Seq.tail)
-        t
-        |> Seq.fold (fun s i -> union s i) h 
+        let (h, t) = (sets |> Seq.headOr empty, sets |> Seq.tailOr Seq.empty)
+        Seq.fold union h t
+
+    let intersectMany (sets: OrderedSet<'a> seq) : OrderedSet<'a> =
+        let (h, t) = (sets |> Seq.headOr empty, sets |> Seq.tailOr Seq.empty)
+        Seq.fold intersect h t
 
     let isSubset (set1: OrderedSet<'a>) (set2: OrderedSet<'a>) : bool =
-        set1 |> forall (fun x -> set2 |> contains x)
+        set1 |> forall (set2 |> flip contains)
 
     let isSuperset (set1: OrderedSet<'a>) (set2: OrderedSet<'a>) : bool =
         isSubset set2 set1
@@ -120,13 +132,13 @@ module OrderedSet =
         List.foldBack folder (set |> toList) state
 
     let ofList (elements: 'a list) : OrderedSet<'a> =
-        elements |> List.fold (fun s t -> s |> add t) empty
+        elements |> List.fold (flip add) empty
 
     let ofSeq (elements: 'a seq) : OrderedSet<'a> =
-        elements |> Seq.fold (fun s t -> s |> add t) empty
+        elements |> Seq.fold (flip add) empty
 
     let ofArray (array: 'a []) : OrderedSet<'a> =
-        array |> Array.fold (fun s t -> s |> add t) empty
+        array |> Array.fold (flip add) empty
 
     let map (mapping: 'a -> 'b) (set: OrderedSet<'a>) : OrderedSet<'b> =
         fold (fun s t -> s |> add (mapping t)) empty set

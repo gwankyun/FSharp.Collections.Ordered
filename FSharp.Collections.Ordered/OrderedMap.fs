@@ -1,5 +1,4 @@
-﻿//namespace Ordered
-namespace FSharp.Collections.Ordered
+﻿namespace FSharp.Collections.Ordered
 
 type OrderedMap<'a, 'b when 'a : comparison> =
     { 

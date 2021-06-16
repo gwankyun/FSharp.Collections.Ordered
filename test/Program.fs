@@ -2,6 +2,32 @@
 open FsCheck
 open FSharp.Collections.Ordered
 
+let flip (f: 'a -> 'b -> 'c) : ('b -> 'a -> 'c) =
+    (fun a b -> f b a)
+
+module List =
+    let headOr (value: 'a) (list: 'a list) : 'a =
+        match list |> List.tryHead with
+        | Some h -> h
+        | None -> value
+
+    let tailOr (value: 'a list) (list: 'a list) : 'a list =
+        match list |> List.isEmpty with
+        | true -> value
+        | false -> list |> List.tail
+
+    let isSubset (set1: int list) (set2: int list) =
+         set1 |> List.forall (set2 |> flip List.contains)
+
+    let isSuperset (set1: int list) (set2: int list) =
+         set2 |> List.forall (set1 |> flip List.contains)
+
+    let isProperSubset (set1: int list) (set2: int list) =
+        (isSubset set1 set2) && (isSubset set2 set1 |> not)
+
+    let isProperSuperset (set1: int list) (set2: int list) =
+        (isSuperset set1 set2) && (isSuperset set2 set1 |> not)
+
 type CheckSet() =
     static member ``[ofList toList]`` (elements: int list) =
         let a = elements |> OrderedSet.ofList |> OrderedSet.toList
@@ -14,8 +40,8 @@ type CheckSet() =
         a = b
 
     //static member ``[ofSeq toSeq]`` (elements: int seq) =
-    //    let a = elements |> Seq.init 100 |> Seq.toList |> OrderedSet.ofList |> OrderedSet.toList
-    //    let b = elements |> Seq.distinct
+    //    let a = elements |> OrderedSet.ofSeq |> OrderedSet.toList
+    //    let b = elements |> Seq.distinct |> Seq.toList
     //    a = b
 
     static member isEmpty (elements: int list) =
@@ -28,7 +54,7 @@ type CheckSet() =
 
     static member ofList (elements: int list) =
         let a = elements |> OrderedSet.ofList |> OrderedSet.toList
-        let b = (List.fold (fun s t -> s |> OrderedSet.add t) OrderedSet.empty elements) |> OrderedSet.toList
+        let b = (List.fold (flip OrderedSet.add) OrderedSet.empty elements) |> OrderedSet.toList
         a = b
 
     static member remove (elements: int list) (v: int) =
@@ -87,13 +113,22 @@ type CheckSet() =
             List.fold folder state ls
         a = b
 
+    static member foldBack (folder: int -> int -> int) (elements: int list) (state: int)  =
+        let a =
+            let s = elements |> OrderedSet.ofList
+            OrderedSet.foldBack folder s state
+        let b =
+            let ls = elements |> List.distinct
+            List.foldBack folder ls state
+        a = b
+
     static member intersect (set1: int list) (set2: int list) =
         let a =
             let s1 = set1 |> OrderedSet.ofList
             let s2 = set2 |> OrderedSet.ofList
             (OrderedSet.intersect s1 s2) |> OrderedSet.toList
         let b =
-            set1 |> List.distinct |> List.filter (fun x -> set2 |> List.contains x)
+            set1 |> List.distinct |> List.filter (set2 |> flip List.contains)
         a = b
 
     static member union (set1: int list) (set2: int list) =
@@ -105,7 +140,79 @@ type CheckSet() =
             (List.append set1 set2) |> List.distinct
         a = b
 
+    static member unionMany (set: int list list) =
+        let a =
+            set |> List.map OrderedSet.ofList |> List.toSeq |> OrderedSet.unionMany |> OrderedSet.toList
+        let b =
+            let s = set |> List.map List.distinct
+            let (h, t) = (set |> List.headOr [], set |> List.tailOr [])
+            let ls = List.fold List.append h t
+            ls |> List.distinct
+        a = b
+
+    static member intersectMany (set: int list list) =
+        let a =
+            set |> List.map OrderedSet.ofList |> List.toSeq |> OrderedSet.intersectMany |> OrderedSet.toList
+        let b =
+            let s = set |> List.map List.distinct
+            let (h, t) = (set |> List.headOr [], set |> List.tailOr [])
+            let ls = List.fold (fun s t ->
+                let tContains = t |> flip List.contains
+                s |> List.filter tContains) h t
+            ls |> List.distinct
+        a = b
+
+    static member isSubset (set1: int list) (set2: int list) =
+        let a = List.isSubset set1 set2
+        let b =
+            (OrderedSet.ofList set1, OrderedSet.ofList set2)
+            ||> OrderedSet.isSubset
+        a = b
+
+    static member isSuperset (set1: int list) (set2: int list) =
+        let a = List.isSuperset set1 set2
+        let b =
+            (OrderedSet.ofList set1, OrderedSet.ofList set2)
+            ||> OrderedSet.isSuperset
+        a = b
+
+    static member isProperSubset (set1: int list) (set2: int list) =
+        let a = List.isProperSubset set1 set2
+        let b =
+            (OrderedSet.ofList set1, OrderedSet.ofList set2)
+            ||> OrderedSet.isProperSubset
+        a = b
+
+    static member isProperSuperset (set1: int list) (set2: int list) =
+        let a = List.isProperSuperset set1 set2
+        let b =
+            (OrderedSet.ofList set1, OrderedSet.ofList set2)
+            ||> OrderedSet.isProperSuperset
+        a = b
+
+    static member maxElement (set: int list) =
+        match set |> List.isEmpty with
+        | true -> true
+        | false ->
+            let a = List.max set
+            let b = set |> OrderedSet.ofList |> OrderedSet.maxElement
+            a = b
+
+    static member minElement (set: int list) =
+        match set |> List.isEmpty with
+        | true -> true
+        | false ->
+            let a = List.min set
+            let b = set |> OrderedSet.ofList |> OrderedSet.minElement
+            a = b
+
+//type CheckMap() =
+//    static member ``[ofList toList]`` (elements: (int * int) list) =
+//        let a = elements |> OrderedMap.ofList |> OrderedMap.toList
+//        let b = elements |> List.distinct
+//        a = b
+
 [<EntryPoint>]
 let main argv =
     Check.QuickAll(typeof<CheckSet>)
-    0 // return an integer exit code
+    0
